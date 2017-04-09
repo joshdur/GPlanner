@@ -2,6 +2,7 @@ package com.drk.tools.gplannercore.core.main;
 
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Transition;
+import com.drk.tools.gplannercore.planner.state.GStateTransition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,16 +41,18 @@ public abstract class BaseUnifier {
         return String.format("%s %s", operatorName, stateCounter.currentValues().toString());
     }
 
-    public void execute(Transition transition) throws Throwable {
+    public Transition execute(Transition transition) throws Throwable {
         StateCounter stateCounter = new StateCounter(transition.variableStateCode, enums);
         List<String> variables = stateCounter.currentValues();
-        execute(variables);
+        StateTransition stateTransition = execute(variables);
+        return new Transition(code, transition.variableStateCode, stateTransition);
     }
 
 
     protected abstract StateTransition build(List<String> variables);
 
-    protected void execute(List<String> variables) throws Throwable{
+    protected StateTransition execute(List<String> variables) throws Throwable{
+        return new GStateTransition();
     }
 
     private static class StateCounter {

@@ -14,6 +14,8 @@ public interface State {
 
     Set<Statement> getStatements();
 
+    State clone();
+
     @Override
     boolean equals(Object object);
 

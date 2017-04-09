@@ -10,4 +10,6 @@ public interface GOutputStream {
     void write(Plan plan, long timeout) throws GStreamException;
 
     void close() throws GStreamException;
+
+    boolean isClosed();
 }

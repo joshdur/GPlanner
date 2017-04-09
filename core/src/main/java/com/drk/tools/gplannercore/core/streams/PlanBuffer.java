@@ -83,6 +83,11 @@ public class PlanBuffer {
         public void close() throws GStreamException {
             internalClose();
         }
+
+        @Override
+        public boolean isClosed() {
+            return isClosed;
+        }
     }
 
     private static class Item {
