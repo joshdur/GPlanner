@@ -25,6 +25,9 @@ public class PlanBuffer {
     }
 
     private void internalClose() {
+        if(isClosed){
+            return;
+        }
         isClosed = true;
         //Unblock producer
         if(isFull()){

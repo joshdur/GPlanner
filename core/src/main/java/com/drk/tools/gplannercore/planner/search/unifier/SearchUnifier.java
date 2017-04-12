@@ -1,34 +1,28 @@
 package com.drk.tools.gplannercore.planner.search.unifier;
 
-import com.drk.tools.gplannercore.core.state.StateTransition;
-import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
 
+import java.util.HashSet;
 import java.util.Set;
 
- public abstract class SearchUnifier {
+public abstract class SearchUnifier {
 
-    private final Set<Statement> statements;
+    protected final Application application;
 
-    public SearchUnifier(Set<Statement> statements) {
-        this.statements = statements;
+    SearchUnifier(Application application) {
+        this.application = application;
     }
 
     public abstract Transition next();
 
-    protected boolean isApplicable(Transition transition){
-        StateTransition stateTransition = transition.stateTransition;
-        boolean isApplicable = statements.containsAll(stateTransition.getPositivePreconditions());
-        return isApplicable && statementsNonContainsAny(stateTransition.getNegativePreconditions());
-    }
-
-    private boolean statementsNonContainsAny(Set<Statement> negativePreconditions){
-        for(Statement statement : negativePreconditions){
-            if(statements.contains(statement)){
-                return false;
-            }
+    public Set<Transition> all() {
+        Set<Transition> transitions = new HashSet<>();
+        Transition transition = next();
+        while (transition != null) {
+            transitions.add(transition);
+            transition = next();
         }
-        return true;
+        return transitions;
     }
 
 }

@@ -11,4 +11,14 @@ public class Transition {
         this.variableStateCode = variableStateCode;
         this.stateTransition = stateTransition;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Transition && stateTransition.equals(((Transition) obj).stateTransition);
+    }
+
+    @Override
+    public int hashCode() {
+        return stateTransition.hashCode();
+    }
 }
