@@ -7,16 +7,23 @@ import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.planner.search.context.SearchContext;
 import com.drk.tools.gplannercore.planner.search.context.SearchNode;
+import com.drk.tools.gplannercore.planner.search.hsp.heuristic.Score;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 
 import java.util.TreeSet;
 
 public class HSP implements Searcher {
 
+    private final Score score;
+
+    public HSP(Score score) {
+        this.score = score;
+    }
+
     private Node buildNode(SearchContext context, State state, Transition transition, Node lastNode) {
         SearchUnifier unifier = context.getUnifier(state);
         int cost = lastNode == null ? 0 : lastNode.cost + 1;
-        int heuristicValue = context.resolveScore(state);
+        int heuristicValue = score.resolve(state);
         return new Node(lastNode, state, transition, unifier, cost, heuristicValue);
     }
 

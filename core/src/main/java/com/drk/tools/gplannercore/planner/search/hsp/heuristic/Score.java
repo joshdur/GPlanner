@@ -1,4 +1,4 @@
-package com.drk.tools.gplannercore.planner.search.context.heuristic;
+package com.drk.tools.gplannercore.planner.search.hsp.heuristic;
 
 import com.drk.tools.gplannercore.core.state.State;
 

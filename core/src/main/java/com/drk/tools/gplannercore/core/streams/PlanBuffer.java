@@ -55,7 +55,7 @@ public class PlanBuffer {
         }
 
         @Override
-        public void close() throws GStreamException {
+        public void close() {
             internalClose();
         }
     }

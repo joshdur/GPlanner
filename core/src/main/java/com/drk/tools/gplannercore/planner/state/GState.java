@@ -2,6 +2,7 @@ package com.drk.tools.gplannercore.planner.state;
 
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Statement;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class GState implements State {
     }
 
     @Override
-    protected State clone() {
+    public State clone() {
         return new GState(statements);
     }
 

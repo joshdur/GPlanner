@@ -7,8 +7,7 @@ import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.streams.GOutputStream;
-import com.drk.tools.gplannercore.planner.search.context.heuristic.DefaultScore;
-import com.drk.tools.gplannercore.planner.search.context.heuristic.Score;
+import com.drk.tools.gplannercore.planner.search.hsp.heuristic.Score;
 import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.TransitionUnifierBuilder;
@@ -26,7 +25,6 @@ public class SearchContext {
     private final Effects effects;
     private final SafeStream safeStream;
     private final UnifierBuilder unifierBuilder;
-    private final Score score;
 
     private SearchContext(Builder builder) {
         this.context = builder.context;
@@ -34,11 +32,6 @@ public class SearchContext {
         this.effects = builder.effects;
         this.safeStream = builder.safeStream;
         this.unifierBuilder = builder.unifierBuilder;
-        this.score = builder.score;
-    }
-
-    public int resolveScore(State state){
-        return score.resolve(state);
     }
 
     public long remainingTime() {
@@ -118,7 +111,6 @@ public class SearchContext {
             this.searchTimer = new SearchTimer(Long.MAX_VALUE);
             this.effects = new Effects(context, false);
             this.unifierBuilder = new OperatorUnifierBuilder(context);
-            this.score = new DefaultScore();
         }
 
         public Builder(SearchContext searchContext){
@@ -127,7 +119,6 @@ public class SearchContext {
             this.searchTimer = searchContext.searchTimer;
             this.effects = searchContext.effects;
             this.unifierBuilder = searchContext.unifierBuilder;
-            this.score = searchContext.score;
         }
 
         public Builder timeout(long timeout){
@@ -142,11 +133,6 @@ public class SearchContext {
 
         public Builder transitions(List<Transition> transitions){
             unifierBuilder = new TransitionUnifierBuilder(transitions);
-            return this;
-        }
-
-        public Builder score(Score score){
-            this.score = score;
             return this;
         }
 

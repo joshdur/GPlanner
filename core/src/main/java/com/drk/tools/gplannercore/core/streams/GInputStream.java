@@ -6,5 +6,5 @@ public interface GInputStream {
 
     Plan read() throws GStreamException;
 
-    void close() throws GStreamException;
+    void close();
 }
