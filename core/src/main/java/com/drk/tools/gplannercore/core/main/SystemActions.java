@@ -4,9 +4,14 @@ import com.drk.tools.gplannercore.core.Bundle;
 
 public abstract class SystemActions {
 
-    protected final Bundle bundle;
+    private Bundle bundle;
 
-    public SystemActions(Bundle bundle) {
+    public final void setBundle(Bundle bundle) {
         this.bundle = bundle;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> T obtain(String key, Class<T> t) {
+        return bundle.get(key, t);
     }
 }

@@ -7,7 +7,6 @@ import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.streams.GOutputStream;
-import com.drk.tools.gplannercore.planner.search.hsp.heuristic.Score;
 import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.TransitionUnifierBuilder;
@@ -103,7 +102,6 @@ public class SearchContext {
         private SearchTimer searchTimer;
         private Effects effects;
         private UnifierBuilder unifierBuilder;
-        private Score score;
 
         public Builder(Context context, GOutputStream outputStream) {
             this.context = context;
