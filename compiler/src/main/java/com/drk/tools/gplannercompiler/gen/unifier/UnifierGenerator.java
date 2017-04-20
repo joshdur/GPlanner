@@ -3,10 +3,12 @@ package com.drk.tools.gplannercompiler.gen.unifier;
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
 
+import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.util.Types;
 import java.util.*;
 
 
@@ -15,20 +17,25 @@ public class UnifierGenerator {
     private final Set<? extends Element> operators;
     private final Set<? extends Element> systemActions;
     private final Logger logger;
+    private final Types types;
 
-    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, Logger logger) {
+    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, Types types, Logger logger) {
         this.operators = operators;
         this.systemActions = systemActions;
         this.logger = logger;
+        this.types = types;
     }
 
-    public void generate() throws GenException {
+    public void generate(Filer filer) throws GenException {
         logger.log(this, "Generate...");
         check();
         logger.log(this, "Building Type Unifiers");
         List<TypeUnifier> typeUnifiers = buildTypeUnifiers();
         logger.log(this, "Generate Unifiers");
-
+        for (TypeUnifier typeUnifier : typeUnifiers) {
+            SpecUnifier specUnifier = new SpecUnifier(typeUnifier);
+            //TODO generate specs
+        }
     }
 
     private List<TypeUnifier> buildTypeUnifiers() {
@@ -53,7 +60,6 @@ public class UnifierGenerator {
         }
         return new ArrayList<>(hashTypes.values());
     }
-
 
     private void check() throws GenException {
         logger.log(this, "Checking operators class");
