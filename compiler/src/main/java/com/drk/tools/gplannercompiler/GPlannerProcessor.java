@@ -1,14 +1,14 @@
 package com.drk.tools.gplannercompiler;
 
+import com.drk.tools.gplannercompiler.gen.CompilerFiler;
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercompiler.gen.domain.DomainGenerator;
+import com.drk.tools.gplannercompiler.gen.context.ContextGenerator;
 import com.drk.tools.gplannercompiler.gen.unifier.UnifierGenerator;
 import com.drk.tools.gplannercore.annotations.Operator;
 import com.drk.tools.gplannercore.annotations.SystemAction;
 import com.drk.tools.gplannercore.annotations.core.Unifier;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -21,14 +21,14 @@ import java.util.Set;
 public class GPlannerProcessor extends AbstractProcessor {
 
     private Types types;
-    private Filer filer;
+    private CompilerFiler filer;
     private Logger logger;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         types = processingEnv.getTypeUtils();
-        filer = processingEnv.getFiler();
+        filer = new CompilerFiler(processingEnv.getFiler());
         logger = new Logger(processingEnv.getMessager());
     }
 
@@ -62,14 +62,14 @@ public class GPlannerProcessor extends AbstractProcessor {
         logger.log(this, "Processing operators and SystemActions");
         Set<? extends Element> operators = roundEnv.getElementsAnnotatedWith(Operator.class);
         Set<? extends Element> actions = roundEnv.getElementsAnnotatedWith(SystemAction.class);
-        UnifierGenerator unifierGenerator = new UnifierGenerator(operators, actions, types, logger);
+        UnifierGenerator unifierGenerator = new UnifierGenerator(operators, actions, logger);
         unifierGenerator.generate(filer);
     }
 
-    private void processUnifiers(RoundEnvironment roundEnv) {
-        logger.log(this, "Processing operators and SystemActions");
+    private void processUnifiers(RoundEnvironment roundEnv) throws GenException {
+        logger.log(this, "Processing Unifiers");
         Set<? extends Element> unifiers = roundEnv.getElementsAnnotatedWith(Unifier.class);
-        DomainGenerator domainGenerator = new DomainGenerator(unifiers, types, logger);
-        domainGenerator.generate(filer);
+        ContextGenerator contextGenerator = new ContextGenerator(unifiers, types, logger);
+        contextGenerator.generate(filer);
     }
 }

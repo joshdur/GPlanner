@@ -15,5 +15,4 @@ public @interface Unifier {
 
     String operator();
 
-    Class[] variables() default {};
 }

@@ -51,9 +51,7 @@ public abstract class BaseUnifier {
 
     protected abstract StateTransition build(List<String> variables);
 
-    protected StateTransition execute(List<String> variables) throws Throwable{
-        return new GStateTransition();
-    }
+    protected abstract StateTransition execute(List<String> variables) throws Throwable;
 
     private static class StateCounter {
 

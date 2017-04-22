@@ -1,14 +1,12 @@
 package com.drk.tools.gplannercompiler.gen.unifier;
 
 import com.drk.tools.gplannercompiler.Logger;
+import com.drk.tools.gplannercompiler.gen.CompilerFiler;
 import com.drk.tools.gplannercompiler.gen.GenException;
 
-import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.util.Types;
+import javax.lang.model.element.VariableElement;
 import java.util.*;
 
 
@@ -17,84 +15,79 @@ public class UnifierGenerator {
     private final Set<? extends Element> operators;
     private final Set<? extends Element> systemActions;
     private final Logger logger;
-    private final Types types;
+    private final UnifierChecker unifierChecker;
 
-    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, Types types, Logger logger) {
+    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, Logger logger) {
         this.operators = operators;
         this.systemActions = systemActions;
         this.logger = logger;
-        this.types = types;
+        this.unifierChecker = new UnifierChecker(logger);
     }
 
-    public void generate(Filer filer) throws GenException {
-        logger.log(this, "Generate...");
-        check();
-        logger.log(this, "Building Type Unifiers");
-        List<TypeUnifier> typeUnifiers = buildTypeUnifiers();
+    public void generate(CompilerFiler filer) throws GenException {
+        logger.log(this, "Generate unifiers...");
+        unifierChecker.check(operators, systemActions);
+        logger.log(this, "Building Specs");
+        List<SpecUnifier> specs = buildSpecs();
         logger.log(this, "Generate Unifiers");
-        for (TypeUnifier typeUnifier : typeUnifiers) {
-            SpecUnifier specUnifier = new SpecUnifier(typeUnifier);
-            //TODO generate specs
+        generateUnifiers(specs, filer);
+    }
+
+    private void generateUnifiers(List<SpecUnifier> specs, CompilerFiler filer) throws GenException {
+        for (SpecUnifier spec : specs) {
+            filer.writeClass(spec.getPackage(), spec.getTypeSpec());
         }
     }
 
-    private List<TypeUnifier> buildTypeUnifiers() {
-        HashMap<String, TypeUnifier> hashTypes = new LinkedHashMap<>();
+
+    private List<SpecUnifier> buildSpecs() throws GenException {
+        List<SpecUnifier> specs = new ArrayList<>();
+        for (TypeUnifier type : buildTypes()) {
+            specs.add(new SpecUnifier(type, logger));
+        }
+        return specs;
+    }
+
+    private List<TypeUnifier> buildTypes() throws GenException {
+        HashMap<String, Container> hashTypes = new LinkedHashMap<>();
         for (Element operator : operators) {
-            String name = operator.getSimpleName().toString();
-            TypeUnifier typeUnifier = hashTypes.get(name);
-            if (typeUnifier == null) {
-                typeUnifier = new TypeUnifier();
-                hashTypes.put(name, typeUnifier);
-            }
-            typeUnifier.setOperator((ExecutableElement) operator);
+            addToHash(operator, hashTypes, true);
         }
         for (Element action : systemActions) {
-            String name = action.getSimpleName().toString();
-            TypeUnifier typeUnifier = hashTypes.get(name);
-            if (typeUnifier == null) {
-                typeUnifier = new TypeUnifier();
-                hashTypes.put(name, typeUnifier);
-            }
-            typeUnifier.setSystemAction((ExecutableElement) action);
+            addToHash(action, hashTypes, false);
         }
-        return new ArrayList<>(hashTypes.values());
+        List<TypeUnifier> types = new ArrayList<>();
+        for (Container container : hashTypes.values()) {
+            unifierChecker.checkSameVariables(container);
+            types.add(new TypeUnifier(container.name, container.operator, container.systemAction, container.operatorVariables));
+        }
+        return types;
     }
 
-    private void check() throws GenException {
-        logger.log(this, "Checking operators class");
-        for (Element operator : operators) {
-            checkMethod(operator);
+    private void addToHash(Element element, HashMap<String, Container> hash, boolean operator) {
+        String name = element.getSimpleName().toString();
+        Container container = hash.get(name);
+        if (container == null) {
+            container = new Container();
+            container.name = name;
+            hash.put(name, container);
         }
-        logger.log(this, "Checking systemActions class");
-        for (Element action : systemActions) {
-            checkMethod(action);
-        }
-    }
-
-    private void checkMethod(Element operator) throws GenException {
-        String name = operator.getSimpleName().toString();
-        if (operator.getKind() != ElementKind.METHOD) {
-            throw new GenException(name + " is not a method");
-        }
-        ExecutableElement method = (ExecutableElement) operator;
-        if (!isAccessible(method)) {
-            throw new GenException(name + " is not accessible");
-        }
-        if (isStatic(method)) {
-            throw new GenException(name + " should not be static");
+        ExecutableElement executableElement = (ExecutableElement) element;
+        if (operator) {
+            container.operator = executableElement;
+            container.operatorVariables = executableElement.getParameters();
+        } else {
+            container.systemAction = executableElement;
+            container.systemActionVariables = executableElement.getParameters();
         }
     }
 
-    private boolean isAccessible(ExecutableElement method) {
-        Set<Modifier> methodModifiers = method.getModifiers();
-        return methodModifiers.contains(Modifier.PUBLIC)
-                || (!methodModifiers.contains(Modifier.PRIVATE) && !methodModifiers.contains(Modifier.PROTECTED));
-    }
 
-    private boolean isStatic(ExecutableElement method) {
-        Set<Modifier> methodModifiers = method.getModifiers();
-        return methodModifiers.contains(Modifier.STATIC);
+    static class Container {
+        String name;
+        ExecutableElement operator;
+        ExecutableElement systemAction;
+        List<? extends VariableElement> operatorVariables;
+        List<? extends VariableElement> systemActionVariables;
     }
-
 }

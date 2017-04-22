@@ -5,4 +5,8 @@ public class GenException extends Exception {
     public GenException(String message) {
         super(message);
     }
+
+    public GenException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class Context {
 
-    private final Bundle bundle;
+    protected final Bundle bundle;
 
     public Context(Bundle bundle) {
         this.bundle = bundle;
@@ -51,5 +51,4 @@ public abstract class Context {
         return unifier.execute(transition);
     }
 
-    public abstract String getToken();
 }
