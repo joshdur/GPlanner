@@ -4,6 +4,7 @@ import com.drk.tools.gplannercore.core.Atom;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,27 +49,45 @@ public class GStateTransition implements StateTransition {
         return (7 * hashCode1) + (17 * hashCode2) + (31 * hashCode3) + (43 * hashCode4);
     }
 
-    public <E extends Enum> GStateTransition check(Atom<E> a, E v){
-        Statement statement = GStatement.from(a, v);
+    public <E extends Enum> GStateTransition check(Atom<E> a, E v) {
+        return check(GStatement.from(a, v));
+    }
+
+    public GStateTransition check(Statement statement) {
         positivePreconditions.add(statement);
         return this;
     }
 
-    public <E extends Enum> GStateTransition checkNot(Atom<E> a, E v){
-        Statement statement = GStatement.from(a, v);
-        negativePreconditions.add(statement);
+    public GStateTransition checkAll(Collection<Statement> statements) {
+        positivePreconditions.addAll(statements);
         return this;
     }
 
-    public <E extends Enum> GStateTransition set(Atom<E> a, E v){
-        Statement statement = GStatement.from(a, v);
+    public <E extends Enum> GStateTransition set(Atom<E> a, E v) {
+        return set(GStatement.from(a, v));
+    }
+
+    public GStateTransition set(Statement statement) {
         positiveEffects.add(statement);
         return this;
     }
 
-    public <E extends Enum> GStateTransition not(Atom<E> a, E v){
-        Statement statement = GStatement.from(a, v);
+    public GStateTransition setAll(Collection<Statement> statements) {
+        positiveEffects.addAll(statements);
+        return this;
+    }
+
+    public <E extends Enum> GStateTransition not(Atom<E> a, E v) {
+        return not(GStatement.from(a, v));
+    }
+
+    public GStateTransition not(Statement statement) {
         negativeEffects.add(statement);
+        return this;
+    }
+
+    public GStateTransition notAll(Collection<Statement> statements) {
+        negativeEffects.addAll(statements);
         return this;
     }
 }
