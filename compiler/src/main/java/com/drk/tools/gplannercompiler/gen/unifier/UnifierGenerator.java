@@ -7,6 +7,7 @@ import com.drk.tools.gplannercompiler.gen.GenException;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Types;
 import java.util.*;
 
 
@@ -17,11 +18,11 @@ public class UnifierGenerator {
     private final Logger logger;
     private final UnifierChecker unifierChecker;
 
-    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, Logger logger) {
+    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, Logger logger, Types types) {
         this.operators = operators;
         this.systemActions = systemActions;
         this.logger = logger;
-        this.unifierChecker = new UnifierChecker(logger);
+        this.unifierChecker = new UnifierChecker(logger, types);
     }
 
     public void generate(CompilerFiler filer) throws GenException {
@@ -58,8 +59,10 @@ public class UnifierGenerator {
         }
         List<TypeUnifier> types = new ArrayList<>();
         for (Container container : hashTypes.values()) {
-            unifierChecker.checkSameVariables(container);
-            types.add(new TypeUnifier(container.name, container.operator, container.systemAction, container.operatorVariables));
+            if (container.hasValidOperator()) {
+                unifierChecker.checkSameVariables(container);
+                types.add(new TypeUnifier(container.name, container.operator, container.systemAction, container.operatorVariables));
+            }
         }
         return types;
     }
@@ -89,5 +92,13 @@ public class UnifierGenerator {
         ExecutableElement systemAction;
         List<? extends VariableElement> operatorVariables;
         List<? extends VariableElement> systemActionVariables;
+
+        boolean hasValidOperator() {
+            return operator != null && operatorVariables != null;
+        }
+
+        boolean hasValidSystemAction(){
+            return systemAction != null && systemActionVariables != null;
+        }
     }
 }

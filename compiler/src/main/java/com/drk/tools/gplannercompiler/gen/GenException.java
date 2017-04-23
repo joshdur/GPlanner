@@ -7,6 +7,6 @@ public class GenException extends Exception {
     }
 
     public GenException(Throwable cause) {
-        super(cause);
+        super(cause.getMessage(), cause);
     }
 }

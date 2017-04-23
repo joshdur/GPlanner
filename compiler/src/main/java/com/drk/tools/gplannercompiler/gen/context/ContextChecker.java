@@ -40,7 +40,7 @@ class ContextChecker {
         for (Element unifierElement : elements) {
             if (unifierElement.getKind() == ElementKind.CONSTRUCTOR) {
                 countConstructors++;
-                constructor = (ExecutableElement) unifier;
+                constructor = (ExecutableElement) unifierElement;
             }
         }
         if (countConstructors > 1 || countConstructors == 0) {

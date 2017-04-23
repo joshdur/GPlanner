@@ -8,6 +8,7 @@ import com.squareup.javapoet.TypeName;
 import javax.lang.model.element.*;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,8 +35,8 @@ class TypeContext {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    List<TypeAndName> getOperatorsTypes() throws GenException {
-        List<TypeAndName> typeAndNames = new ArrayList<>();
+    Set<TypeAndName> getOperatorsTypes() throws GenException {
+        Set<TypeAndName> typeAndNames = new HashSet<>();
         for (TypeElement unifier : unifiers) {
             TypeElement operators = getVariable(unifier, Operators.class);
             if (operators == null) {
@@ -48,8 +49,8 @@ class TypeContext {
         return typeAndNames;
     }
 
-    List<TypeAndName> getSystemActionTypes() {
-        List<TypeAndName> typeAndNames = new ArrayList<>();
+    Set<TypeAndName> getSystemActionTypes() {
+        Set<TypeAndName> typeAndNames = new HashSet<>();
         for (TypeElement unifier : unifiers) {
             TypeElement systemActions = getVariable(unifier, SystemActions.class);
             if (systemActions != null) {
@@ -88,7 +89,7 @@ class TypeContext {
                 List<? extends VariableElement> variables = constructor.getParameters();
                 for (VariableElement variableElement : variables) {
                     TypeElement variableType = (TypeElement) types.asElement(variableElement.asType());
-                    if (variableType.getSuperclass().toString().equals(parent.getCanonicalName())) {
+                    if (variableType.getSuperclass().toString().contains(parent.getCanonicalName())) {
                         return variableType;
                     }
                 }

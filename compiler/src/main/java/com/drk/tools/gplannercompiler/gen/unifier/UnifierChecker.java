@@ -4,17 +4,22 @@ import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
 import com.drk.tools.gplannercore.core.main.Operators;
 import com.drk.tools.gplannercore.core.main.SystemActions;
+import com.drk.tools.gplannercore.core.state.StateTransition;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
+import java.util.List;
 import java.util.Set;
 
 class UnifierChecker {
 
     private final Logger logger;
+    private final Types types;
 
-    UnifierChecker(Logger logger) {
+    UnifierChecker(Logger logger, Types types) {
         this.logger = logger;
+        this.types = types;
     }
 
     void check(Set<? extends Element> operators, Set<? extends Element> systemActions) throws GenException {
@@ -40,6 +45,19 @@ class UnifierChecker {
         if (isStatic(method)) {
             throw new GenException(name + " should not be static");
         }
+
+        List<? extends VariableElement> parameters = method.getParameters();
+        for (VariableElement variable : parameters) {
+            TypeElement typeElement = (TypeElement) types.asElement(variable.asType());
+            if (!typeElement.getSuperclass().toString().contains(Enum.class.getCanonicalName())) {
+                throw new GenException(name + " parameters must be enums");
+            }
+        }
+
+        if (!method.getReturnType().toString().contains(StateTransition.class.getCanonicalName())) {
+            throw new GenException(name + " must return a StateTransition");
+        }
+
         checkParentExtendsFrom(method, parent);
     }
 
@@ -64,13 +82,16 @@ class UnifierChecker {
     }
 
     void checkSameVariables(UnifierGenerator.Container container) throws GenException {
+        if (!container.hasValidSystemAction()) {
+            return;
+        }
         if (container.operatorVariables.size() != container.systemActionVariables.size()) {
             throw new GenException(container.name + " does not hame the same number of variables");
         }
         for (int i = 0; i < container.operatorVariables.size(); i++) {
             VariableElement oElement = container.operatorVariables.get(i);
             VariableElement sElement = container.systemActionVariables.get(i);
-            if(!oElement.asType().toString().equals(sElement.asType().toString())){
+            if (!oElement.asType().toString().equals(sElement.asType().toString())) {
                 throw new GenException(String.format("Parameter %d in %s is not coincident between operator and system action", i, container.name));
             }
         }

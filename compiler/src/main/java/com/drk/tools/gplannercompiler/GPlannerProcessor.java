@@ -49,7 +49,6 @@ public class GPlannerProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
-            logger.log(this, "Start processing");
             processOperatorsAndSystemActions(roundEnv);
             processUnifiers(roundEnv);
         } catch (Exception e) {
@@ -59,16 +58,22 @@ public class GPlannerProcessor extends AbstractProcessor {
     }
 
     private void processOperatorsAndSystemActions(RoundEnvironment roundEnv) throws GenException {
-        logger.log(this, "Processing operators and SystemActions");
         Set<? extends Element> operators = roundEnv.getElementsAnnotatedWith(Operator.class);
         Set<? extends Element> actions = roundEnv.getElementsAnnotatedWith(SystemAction.class);
-        UnifierGenerator unifierGenerator = new UnifierGenerator(operators, actions, logger);
+        if(operators.isEmpty()){
+            return;
+        }
+        logger.log(this, "Processing operators and SystemActions");
+        UnifierGenerator unifierGenerator = new UnifierGenerator(operators, actions, logger, types);
         unifierGenerator.generate(filer);
     }
 
     private void processUnifiers(RoundEnvironment roundEnv) throws GenException {
-        logger.log(this, "Processing Unifiers");
         Set<? extends Element> unifiers = roundEnv.getElementsAnnotatedWith(Unifier.class);
+        if(unifiers.isEmpty()){
+            return;
+        }
+        logger.log(this, "Processing Unifiers");
         ContextGenerator contextGenerator = new ContextGenerator(unifiers, types, logger);
         contextGenerator.generate(filer);
     }

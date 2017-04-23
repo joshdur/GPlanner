@@ -1,5 +1,6 @@
 package com.drk.tools.gplannercompiler.gen.unifier;
 
+import com.drk.tools.gplannercore.core.main.SystemActions;
 import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.element.ExecutableElement;
@@ -65,8 +66,12 @@ class TypeUnifier {
     }
 
     TypeName getSystemActionsType() {
-        TypeElement typeElement = getTypeElement(systemAction);
-        return TypeName.get(typeElement.asType());
+        if(existsSystemAction()) {
+            TypeElement typeElement = getTypeElement(systemAction);
+            return TypeName.get(typeElement.asType());
+        } else {
+            return TypeName.get(SystemActions.class);
+        }
     }
 
     private TypeElement getTypeElement(ExecutableElement element) {
