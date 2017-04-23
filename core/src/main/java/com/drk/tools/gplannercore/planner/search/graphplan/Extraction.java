@@ -13,7 +13,7 @@ class Extraction {
         GraphPlan.Layer currentLayer = layer;
         Set<Statement> preconds = finalState.getStatements();
         while(currentLayer != null){
-            Set<Transition> transitions = extractRelevantTransition(layer, preconds);
+            Set<Transition> transitions = extractRelevantTransition(currentLayer, preconds);
             layeredPlan.add(transitions);
             preconds = allPreconds(transitions);
             currentLayer = currentLayer.lastLayer;

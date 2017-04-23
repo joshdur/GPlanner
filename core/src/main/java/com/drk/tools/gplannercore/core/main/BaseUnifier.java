@@ -32,8 +32,9 @@ public abstract class BaseUnifier {
     public Transition next() {
         List<String> enums = stateCounter.currentValues();
         StateTransition stateTransition = build(enums);
+        int counterPosition = stateCounter.getPosition();
         stateCounter.next();
-        return new Transition(code, stateCounter.getPosition(), stateTransition);
+        return new Transition(code, counterPosition, stateTransition);
     }
 
     public String asString(Transition transition) {

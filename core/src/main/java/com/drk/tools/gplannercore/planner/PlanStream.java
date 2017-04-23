@@ -11,8 +11,7 @@ public class PlanStream {
 
     public enum State {
         OPEN,
-        CLOSED,
-        ERROR
+        CLOSED
     }
 
     private final List<Plan> planList = new ArrayList<>();
@@ -27,21 +26,31 @@ public class PlanStream {
         this.state = State.OPEN;
     }
 
-    public List<Plan> read() throws GStreamException {
-        if (state != State.OPEN) {
-            throw new GStreamException("Stream is Closed");
+    public List<Plan> read() {
+        if (state == State.CLOSED) {
+            return new ArrayList<>();
         }
-        while (planList.size() < size && state == State.OPEN) {
+        try {
+            readToBuffer();
+        } catch (GStreamException e) {
+            throwable = e;
+            close();
+        }
+        List<Plan> plans = new ArrayList<>(planList);
+        planList.clear();
+        return plans;
+    }
+
+    private void readToBuffer() throws GStreamException {
+        while (planList.size() < size) {
             Plan plan = inputStream.read();
             if (plan != null) {
                 planList.add(plan);
             } else {
                 close();
+                return;
             }
         }
-        List<Plan> plans = new ArrayList<>(planList);
-        planList.clear();
-        return plans;
     }
 
     public void close() {
@@ -53,7 +62,6 @@ public class PlanStream {
 
     void setError(Throwable throwable) {
         this.throwable = throwable;
-        this.state = State.ERROR;
     }
 
     public State getState() {
@@ -62,5 +70,9 @@ public class PlanStream {
 
     public Throwable getError() {
         return throwable;
+    }
+
+    public boolean hasError(){
+        return throwable != null;
     }
 }

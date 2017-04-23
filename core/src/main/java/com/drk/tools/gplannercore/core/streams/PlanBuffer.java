@@ -25,22 +25,21 @@ public class PlanBuffer {
     }
 
     private void internalClose() {
-        if(isClosed){
+        if (isClosed) {
             return;
         }
         isClosed = true;
         //Unblock producer
-        if(isFull()){
+        if (isFull()) {
             queue.poll();
         }
         //Unblock consumer
-        if(queue.isEmpty()) {
-            queue.offer(new Item(null));
-        }
+        queue.offer(new Item(null));
+
     }
 
-    private boolean isFull(){
-       return queue.remainingCapacity() == 0;
+    private boolean isFull() {
+        return queue.remainingCapacity() == 0;
     }
 
     private class InputStream implements GInputStream {
@@ -50,8 +49,12 @@ public class PlanBuffer {
             if (isClosed) {
                 throw new GStreamException("Stream is Closed");
             }
-            Item item = queue.poll();
-            return item.plan;
+            try {
+                Item item = queue.poll(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                return item == null ? null : item.plan;
+            } catch (InterruptedException e) {
+                throw new GStreamException(e);
+            }
         }
 
         @Override
@@ -64,7 +67,7 @@ public class PlanBuffer {
 
         @Override
         public void write(Plan plan) throws GStreamException {
-            if(isClosed){
+            if (isClosed) {
                 throw new GStreamException("Stream is Closed");
             }
             queue.offer(new Item(plan));
@@ -72,7 +75,7 @@ public class PlanBuffer {
 
         @Override
         public void write(Plan plan, long timeout) throws GStreamException {
-            if(isClosed){
+            if (isClosed) {
                 throw new GStreamException("Stream is Closed");
             }
             try {

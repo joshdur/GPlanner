@@ -9,10 +9,20 @@ public class TransitionUnifier extends SearchUnifier {
     private final List<Transition> transitions;
     private int index;
 
+    private static int ID = 0;
+    private int currentId;
+
+    private static int getID(){
+        int id = ID;
+        ID ++;
+        return id;
+    }
+
     public TransitionUnifier(List<Transition> transitions, Application application) {
         super(application);
         this.transitions = transitions;
         this.index = 0;
+        this.currentId = getID();
     }
 
     private boolean hasNext() {
@@ -21,6 +31,9 @@ public class TransitionUnifier extends SearchUnifier {
 
     @Override
     public Transition next() {
+        if(currentId == 0){
+            System.out.print("");
+        }
         while (hasNext()) {
             Transition transition = transitions.get(index);
             index++;

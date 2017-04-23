@@ -31,7 +31,7 @@ public class SimpleForward implements Searcher {
                 if (transition != null) {
                     State newState = searchContext.applyEffects(node.state, transition);
                     if (!searchContext.existsInSequence(newState, node)) {
-                        Node newNode = buildNode(newState, transition, node, searchContext.getUnifier(initialState));
+                        Node newNode = buildNode(newState, transition, node, searchContext.getUnifier(newState));
                         if (searchContext.validate(newState, finalState)) {
                             Plan plan = searchContext.recoverSequence(newNode);
                             searchContext.pushPlan(plan);

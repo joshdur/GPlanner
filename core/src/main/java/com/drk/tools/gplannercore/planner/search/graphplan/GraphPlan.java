@@ -38,12 +38,12 @@ public class GraphPlan implements Searcher {
 
         if (reachedGoal) {
             List<Set<Transition>> layeredPlan = Extraction.extract(layer, finalState);
-            List<Transition> flatSet = new ArrayList<>();
+            Set<Transition> flatSet = new HashSet<>();
             for (Set<Transition> set : layeredPlan) {
                 flatSet.addAll(set);
             }
             SearchContext.Builder builder = new SearchContext.Builder(context);
-            builder.transitions(flatSet);
+            builder.transitions(new ArrayList<>(flatSet));
             searcher.startSearch(builder.build(), initialState, finalState);
         }
     }
