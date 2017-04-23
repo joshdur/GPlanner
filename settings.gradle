@@ -1,4 +1,6 @@
 include ':core'
 include ':compiler'
 include ':sample'
+include 'androidcontext'
+include 'gplanner_android'
 
