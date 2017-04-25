@@ -3,14 +3,12 @@ package com.drk.tools.contextandroid;
 import com.drk.tools.contextandroid.domain.PagerInfo;
 import com.drk.tools.contextandroid.domain.ScreenInfo;
 import com.drk.tools.contextandroid.domain.ViewInfo;
-import com.drk.tools.contextandroid.planner.domain.ActionInfo;
-import com.drk.tools.contextandroid.planner.domain.BackInfo;
-import com.drk.tools.contextandroid.planner.domain.HierarchyInfo;
-import com.drk.tools.contextandroid.planner.domain.TextInfo;
+import com.drk.tools.contextandroid.planner.domain.*;
 import com.drk.tools.contextandroid.planner.variables.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
+
+import static com.drk.tools.contextandroid.planner.domain.HierarchyInfo.Parent;
 
 public class AndroidViewInfo {
 
@@ -33,19 +31,72 @@ public class AndroidViewInfo {
     }
 
     HierarchyInfo getHierarchyInfo() {
+        HashMap<ViewInfo, Element> inverseMapElements = inverse(mapElements);
+        HashMap<PagerInfo, PagerElement> inverseMapPagers = inverse(mapPagers);
 
+        HashMap<Element, HierarchyInfo.Parent> hashParents = new LinkedHashMap<>();
+        HashMap<PagerElement, HierarchyInfo.Parent> hashPagerParents = new LinkedHashMap<>();
+        for (Map.Entry<Screen, ScreenInfo> entry : mapScreens.entrySet()) {
+            Screen screen = entry.getKey();
+            ScreenInfo screenInfo = entry.getValue();
+            for (ViewInfo viewInfo : screenInfo.views) {
+                Element element = inverseMapElements.get(viewInfo);
+                hashParents.put(element, new Parent(screen, null, -1));
+            }
+            for (PagerInfo pagerInfo : screenInfo.pagers) {
+                PagerElement pagerElement = inverseMapPagers.get(pagerInfo);
+                hashPagerParents.put(pagerElement, new Parent(screen, null, -1));
+                for (Map.Entry<Integer, List<ViewInfo>> e : pagerInfo.views.entrySet()) {
+                    int page = e.getKey();
+                    for (ViewInfo viewInfo : e.getValue()) {
+                        Element element = inverseMapElements.get(viewInfo);
+                        hashParents.put(element, new Parent(null, pagerElement, page));
+                    }
+                }
+            }
+        }
+        return new HierarchyInfo(hashParents, hashPagerParents);
     }
 
-    TextInfo getTextInfo() {
-
+    TextInfo getTextInfo(Set<IdText> checkTexts, Set<IdText> inputTexts) {
+        return null;
     }
 
     BackInfo getBackInfo() {
-
+        ActionSolver actionSolver = new ActionSolver(mapScreens);
+        HashMap<Screen, Screen> backData = new LinkedHashMap<>();
+        for (Map.Entry<Screen, ScreenInfo> entry : mapScreens.entrySet()) {
+            ScreenInfo screenInfo = entry.getValue();
+            backData.put(entry.getKey(), actionSolver.solveBackData(screenInfo.back));
+        }
+        return new BackInfo(backData);
     }
 
     ActionInfo getActionInfo() {
+        ActionSolver actionSolver = new ActionSolver(mapScreens);
+        HashMap<Element, ActionInfo.ActionData> hashData = new LinkedHashMap<>();
+        for (Map.Entry<Element, ViewInfo> entry : mapElements.entrySet()) {
+            Element element = entry.getKey();
+            ViewInfo viewInfo = entry.getValue();
+            if (viewInfo.hasClickDefined()) {
+                ActionInfo.ActionData actionData = actionSolver.solveActionData(viewInfo.navigationInfo);
+                hashData.put(element, actionData);
+            }
+        }
+        return new ActionInfo(hashData);
+    }
 
+    InitInfo getInitInfo() {
+        List<Screen> screens = new ArrayList<>(mapScreens.keySet());
+        return new InitInfo(!screens.isEmpty() ? screens.get(0) : null);
+    }
+
+    private <A, B> HashMap<B, A> inverse(HashMap<A, B> hash) {
+        HashMap<B, A> inverse = new LinkedHashMap<>();
+        for (A key : hash.keySet()) {
+            inverse.put(hash.get(key), key);
+        }
+        return inverse;
     }
 
     public static class Builder {
@@ -66,13 +117,20 @@ public class AndroidViewInfo {
 
         public Builder addScreen(ScreenInfo screenInfo) {
             mapScreens.put(Screen.values()[mapScreens.size()], screenInfo);
-            for (ViewInfo info : screenInfo.views) {
-                mapElements.put(Element.values()[mapElements.size()], info);
-            }
+            addViewInfos(screenInfo.views);
             for (PagerInfo pagerInfo : screenInfo.pagers) {
                 mapPagers.put(PagerElement.values()[mapPagers.size()], pagerInfo);
+                for (Map.Entry<Integer, List<ViewInfo>> entry : pagerInfo.views.entrySet()) {
+                    addViewInfos(entry.getValue());
+                }
             }
             return this;
+        }
+
+        private void addViewInfos(Collection<ViewInfo> viewInfos) {
+            for (ViewInfo info : viewInfos) {
+                mapElements.put(Element.values()[mapElements.size()], info);
+            }
         }
 
         public Builder addInjections(Enum[] injections) {

@@ -7,9 +7,9 @@ import java.util.List;
 
 public class PagerInfo {
 
-    private final int id;
-    private final int pages;
-    private final HashMap<Integer, List<ViewInfo>> views;
+    public final int id;
+    public final int pages;
+    public final HashMap<Integer, List<ViewInfo>> views;
 
     private PagerInfo(Builder builder) {
         this.id = builder.id;

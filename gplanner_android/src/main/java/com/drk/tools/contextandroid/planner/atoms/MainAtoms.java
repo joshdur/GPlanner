@@ -1,14 +1,20 @@
-package com.drk.tools.contextandroid.atoms;
+package com.drk.tools.contextandroid.planner.atoms;
 
-import com.drk.tools.contextandroid.variables.*;
+import com.drk.tools.contextandroid.planner.variables.*;
 import com.drk.tools.gplannercore.core.Atom;
 
 public class MainAtoms {
 
-    public static IsMocked isMocked = new IsMocked();
-    public static IsAppLaunched isAppLaunched = new IsAppLaunched();
+    public static MockRequestPending mockRequestPending = new MockRequestPending();
+    public static MockInjectionPending mockInjectionPending = new MockInjectionPending();
+    public static AppLaunchPending appLaunchPending = new AppLaunchPending();
+    public static ScreenNavigationPending screenNavigationPending = new ScreenNavigationPending();
     public static IsSearchFinished isSearchFinished = new IsSearchFinished();
+
+    public static MockedInjection mockedInjection = new MockedInjection();
+    public static MockedRequest mockedRequest = new MockedRequest();
     public static At at = new At();
+    public static NavigateTo navigateTo = new NavigateTo();
     public static ScreenChecked screenChecked = new ScreenChecked();
     public static ElementVisible elementVisible = new ElementVisible();
     public static PagerElementVisible pagerElementVisible = new PagerElementVisible();
@@ -17,11 +23,27 @@ public class MainAtoms {
     public static ElementTextSet elementTextSet = new ElementTextSet();
     public static BackAt backAt = new BackAt();
 
-    public static class IsMocked extends Atom<Bool> {
+    public static class MockRequestPending extends Atom<Bool> {
 
     }
 
-    public static class IsAppLaunched extends Atom<Bool> {
+    public static class MockInjectionPending extends Atom<Bool> {
+
+    }
+
+    public static class MockedRequest extends Atom<Request> {
+
+    }
+
+    public static class MockedInjection extends Atom<Injection> {
+
+    }
+
+    public static class AppLaunchPending extends Atom<Bool> {
+
+    }
+
+    public static class ScreenNavigationPending extends Atom<Bool> {
 
     }
 
@@ -30,6 +52,10 @@ public class MainAtoms {
     }
 
     public static class At extends Atom<Screen> {
+
+    }
+
+    public static class NavigateTo extends Atom<Screen> {
 
     }
 

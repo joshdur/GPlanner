@@ -1,19 +1,25 @@
-package com.drk.tools.contextandroid.domain;
+package com.drk.tools.contextandroid.planner.domain;
 
-import com.drk.tools.contextandroid.variables.Element;
+import com.drk.tools.contextandroid.planner.variables.Element;
 import com.drk.tools.gplannercore.core.state.Statement;
 
+import java.util.HashMap;
 import java.util.Set;
 
 public class ActionInfo {
 
+    private final HashMap<Element, ActionData> hashActionData;
+
+    public ActionInfo(HashMap<Element, ActionData> hashActionData) {
+        this.hashActionData = hashActionData;
+    }
 
     public boolean isActionDefined(Element element) {
-        return false;
+        return hashActionData.containsKey(element);
     }
 
     public ActionData actionOf(Element element) {
-        return null;
+        return hashActionData.get(element);
     }
 
     public static class ActionData {

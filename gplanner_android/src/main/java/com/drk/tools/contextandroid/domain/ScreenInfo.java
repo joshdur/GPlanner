@@ -8,11 +8,13 @@ public class ScreenInfo {
     public final String name;
     public final List<ViewInfo> views;
     public final List<PagerInfo> pagers;
+    public final NavigationInfo back;
 
     private ScreenInfo(Builder builder) {
         this.name = builder.name;
         this.views = builder.views;
         this.pagers = builder.pagers;
+        this.back = builder.back;
     }
 
     public static Builder builder(String name) {
@@ -24,6 +26,7 @@ public class ScreenInfo {
         private final String name;
         private List<ViewInfo> views;
         private List<PagerInfo> pagers;
+        public NavigationInfo back;
 
         Builder(String name) {
             this.name = name;
@@ -38,6 +41,11 @@ public class ScreenInfo {
 
         public Builder addPager(PagerInfo pagerInfo) {
             pagers.add(pagerInfo);
+            return this;
+        }
+
+        public Builder back(NavigationInfo navigationInfo) {
+            this.back = navigationInfo;
             return this;
         }
 
