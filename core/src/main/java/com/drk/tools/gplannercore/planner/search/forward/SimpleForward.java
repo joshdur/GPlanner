@@ -13,9 +13,18 @@ import java.util.Stack;
 
 public class SimpleForward implements Searcher {
 
+    private final boolean debug;
 
     private Node buildNode(State state, Transition transition, Node lastNode, SearchUnifier unifier) {
         return new Node(lastNode, state, transition, unifier);
+    }
+
+    public SimpleForward(boolean debug) {
+        this.debug = debug;
+    }
+
+    public SimpleForward() {
+        this(false);
     }
 
     @Override
@@ -32,6 +41,13 @@ public class SimpleForward implements Searcher {
                     State newState = searchContext.applyEffects(node.state, transition);
                     if (!searchContext.existsInSequence(newState, node)) {
                         Node newNode = buildNode(newState, transition, node, searchContext.getUnifier(newState));
+                        if (debug) {
+                            Plan plan = searchContext.recoverSequence(newNode);
+                            System.out.println();
+                            System.out.println(searchContext.getContext().asString(plan));
+                            System.out.println(newState.toString());
+                        }
+
                         if (searchContext.validate(newState, finalState)) {
                             Plan plan = searchContext.recoverSequence(newNode);
                             searchContext.pushPlan(plan);
@@ -40,6 +56,7 @@ public class SimpleForward implements Searcher {
                         }
                     }
                 } else {
+
                     stack.pop();
                 }
             }

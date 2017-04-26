@@ -45,6 +45,8 @@ public class GraphPlan implements Searcher {
             SearchContext.Builder builder = new SearchContext.Builder(context);
             builder.transitions(new ArrayList<>(flatSet));
             searcher.startSearch(builder.build(), initialState, finalState);
+        } else {
+            context.close();
         }
     }
 
@@ -93,6 +95,18 @@ public class GraphPlan implements Searcher {
             this.applicableTransitions = applicableTransitions;
             this.transitionExclusions = transitionExclusions;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Layer) {
+                Layer otherLayer = (Layer) obj;
+                return statements.equals(otherLayer.statements)
+                        && applicableTransitions.equals(otherLayer.applicableTransitions)
+                        && transitionExclusions.equals(otherLayer.transitionExclusions);
+            }
+            return super.equals(obj);
+        }
+
     }
 
     static class Rel {

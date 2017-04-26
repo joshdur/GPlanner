@@ -1,8 +1,9 @@
 package com.drk.tools.gplannercore.planner.state;
 
 import com.drk.tools.gplannercore.core.Atom;
+import com.drk.tools.gplannercore.core.state.StateBuilder;
 
-public class GStateBuilder {
+public class GStateBuilder implements StateBuilder {
 
     private final GState state;
 

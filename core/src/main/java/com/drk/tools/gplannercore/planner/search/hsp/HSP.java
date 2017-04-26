@@ -20,17 +20,17 @@ public class HSP implements Searcher {
         this.score = score;
     }
 
-    private Node buildNode(SearchContext context, State state, Transition transition, Node lastNode) {
+    private Node buildNode(SearchContext context, State state, Transition transition, Node lastNode, State finalState) {
         SearchUnifier unifier = context.getUnifier(state);
         int cost = lastNode == null ? 0 : lastNode.cost + 1;
-        int heuristicValue = score.resolve(state);
+        int heuristicValue = score.resolve(context.getContext(), state, finalState);
         return new Node(lastNode, state, transition, unifier, cost, heuristicValue);
     }
 
     @Override
     public void startSearch(SearchContext context, State initialState, State finalState) throws SearchException {
         PriorityQueue queue = new PriorityQueue();
-        Node root = buildNode(context, initialState, null, null);
+        Node root = buildNode(context, initialState, null, null, finalState);
         queue.push(root);
 
         try {
@@ -41,11 +41,10 @@ public class HSP implements Searcher {
                 if (transition != null) {
                     State newState = context.applyEffects(node.state, transition);
                     if (!context.existsInSequence(newState, node)) {
-                        Node newNode = buildNode(context, newState, transition, node);
+                        Node newNode = buildNode(context, newState, transition, node, finalState);
                         if (context.validate(newState, finalState)) {
                             Plan plan = context.recoverSequence(newNode);
                             context.pushPlan(plan);
-                            context.close();
                         } else {
                             queue.push(newNode);
                         }
