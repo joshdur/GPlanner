@@ -9,26 +9,31 @@ public class PathTokens {
     final Set<IdText> textToInput;
     final Set<String> ats;
     final Set<Integer> clickeds;
-    final Set<Enum> mockInjections;
-    final Set<Enum> mockRequests;
+    final Enum mock;
 
     private PathTokens(Builder builder) {
         textToCheck = builder.textToCheck;
         textToInput = builder.textToInput;
         ats = builder.ats;
         clickeds = builder.clickeds;
-        mockInjections = builder.mockInjections;
-        mockRequests = builder.mockRequests;
+        mock = builder.mock;
+    }
+
+    boolean shouldMock() {
+        return mock != null;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
 
-        final Set<IdText> textToCheck = new HashSet<>();
-        final Set<IdText> textToInput = new HashSet<>();
-        final Set<String> ats = new HashSet<>();
-        final Set<Integer> clickeds = new HashSet<>();
-        final Set<Enum> mockInjections = new HashSet<>();
-        final Set<Enum> mockRequests = new HashSet<>();
+        private final Set<IdText> textToCheck = new HashSet<>();
+        private final Set<IdText> textToInput = new HashSet<>();
+        private final Set<String> ats = new HashSet<>();
+        private final Set<Integer> clickeds = new HashSet<>();
+        private Enum mock;
 
         public Builder checkText(int resId, String text) {
             textToCheck.add(new IdText(resId, text));
@@ -40,7 +45,7 @@ public class PathTokens {
             return this;
         }
 
-        public Builder at(String screenName) {
+        public Builder checkAt(String screenName) {
             ats.add(screenName);
             return this;
         }
@@ -50,13 +55,8 @@ public class PathTokens {
             return this;
         }
 
-        public Builder mockRequest(Enum e) {
-            mockRequests.add(e);
-            return this;
-        }
-
-        public Builder mockInjection(Enum e) {
-            mockInjections.add(e);
+        public Builder mock(Enum e) {
+            mock = e;
             return this;
         }
 

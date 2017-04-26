@@ -17,6 +17,10 @@ public class ScreenInfo {
         this.back = builder.back;
     }
 
+    public boolean hashBackInfo() {
+        return back != null;
+    }
+
     public static Builder builder(String name) {
         return new Builder(name);
     }
@@ -26,7 +30,7 @@ public class ScreenInfo {
         private final String name;
         private List<ViewInfo> views;
         private List<PagerInfo> pagers;
-        public NavigationInfo back;
+        private NavigationInfo back;
 
         Builder(String name) {
             this.name = name;

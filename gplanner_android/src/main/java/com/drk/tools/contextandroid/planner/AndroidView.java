@@ -6,6 +6,7 @@ import com.drk.tools.gplannercore.annotations.Operator;
 import com.drk.tools.gplannercore.core.main.Operators;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.planner.state.GStateTransition;
+import com.drk.tools.gplannercore.planner.state.debug.DebugStateTransition;
 
 import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.*;
 
@@ -15,52 +16,33 @@ public class AndroidView extends Operators {
         return obtain(tClass.toString(), tClass);
     }
 
-    private GStateTransition newTransition() {
-        GStateTransition stateTransition = new GStateTransition();
+    private StateTransition newTransition() {
+        SearchInfo searchInfo = get(SearchInfo.class);
+        return searchInfo.isDebug ? new DebugStateTransition() : new GStateTransition();
+    }
+
+    @Operator
+    public StateTransition mock(Mock mock) {
+        StateTransition stateTransition = newTransition();
         stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.TRUE);
+        stateTransition.check(mockPending, Bool.TRUE);
+        stateTransition.set(mocked, mock);
+
+        stateTransition.set(mockPending, Bool.FALSE);
+        stateTransition.not(mockPending, Bool.TRUE);
         return stateTransition;
     }
-
-    private GStateTransition launchedTransition() {
-        GStateTransition stateTransition = newTransition();
-        stateTransition.check(appLaunchPending, Bool.FALSE);
-        return stateTransition;
-    }
-
-    @Operator
-    public StateTransition mockInjection(Injection injection) {
-        GStateTransition stateTransition = newTransition();
-        stateTransition.check(appLaunchPending, Bool.TRUE);
-        stateTransition.check(mockInjectionPending, Bool.TRUE);
-
-        stateTransition.set(mockInjectionPending, Bool.FALSE);
-        stateTransition.not(mockInjectionPending, Bool.TRUE);
-        return stateTransition;
-    }
-
-    @Operator
-    public StateTransition mockRequest(Request request) {
-        GStateTransition stateTransition = newTransition();
-        stateTransition.check(appLaunchPending, Bool.TRUE);
-        stateTransition.check(mockInjectionPending, Bool.FALSE);
-        stateTransition.check(mockRequestPending, Bool.TRUE);
-
-        stateTransition.set(mockRequestPending, Bool.FALSE);
-        stateTransition.not(mockRequestPending, Bool.TRUE);
-        return stateTransition;
-    }
-
-
 
     @Operator
     public StateTransition launchApp() {
-        GStateTransition stateTransition = newTransition();
-        stateTransition.check(appLaunchPending, Bool.TRUE);
-        stateTransition.check(mockInjectionPending, Bool.FALSE);
-        stateTransition.check(mockRequestPending, Bool.FALSE);
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.TRUE);
+        stateTransition.check(mockPending, Bool.FALSE);
 
-        stateTransition.set(appLaunchPending, Bool.FALSE);
-        stateTransition.not(appLaunchPending, Bool.TRUE);
+        stateTransition.set(launchPending, Bool.FALSE);
+        stateTransition.not(launchPending, Bool.TRUE);
 
         InitInfo initInfo = get(InitInfo.class);
         if (initInfo.hasInitScreen()) {
@@ -71,7 +53,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition navigate(Screen from, Screen to) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         if (from == to) {
             return stateTransition;
         }
@@ -90,7 +74,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition checkScreen(Screen screen) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
         stateTransition.check(at, screen);
         stateTransition.set(screenChecked, screen);
@@ -99,7 +85,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition checkVisibility(Element element) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
         checkAtScreen(stateTransition, element);
         stateTransition.set(elementVisible, element);
@@ -108,7 +96,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition checkPagerVisibility(PagerElement pagerElement) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
         checkAtScreen(stateTransition, pagerElement);
         stateTransition.set(pagerElementVisible, pagerElement);
@@ -118,7 +108,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition checkElementText(Element element) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
         checkAtScreen(stateTransition, element);
         TextInfo textInfo = get(TextInfo.class);
@@ -131,7 +123,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition setElementText(Element element) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
         checkAtScreen(stateTransition, element);
         TextInfo textInfo = get(TextInfo.class);
@@ -144,7 +138,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition clickElement(Element element) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
         checkAtScreen(stateTransition, element);
         ActionInfo actionInfo = get(ActionInfo.class);
@@ -161,7 +157,9 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition backAt(Screen screen) {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
         stateTransition.check(at, screen);
         BackInfo backInfo = get(BackInfo.class);
@@ -175,31 +173,35 @@ public class AndroidView extends Operators {
 
     @Operator
     public StateTransition closeApp() {
-        GStateTransition stateTransition = launchedTransition();
+        StateTransition stateTransition = newTransition();
+        stateTransition.check(isSearchFinished, Bool.FALSE);
+        stateTransition.check(launchPending, Bool.FALSE);
         stateTransition.check(screenNavigationPending, Bool.FALSE);
-        stateTransition.set(appLaunchPending, Bool.FALSE);
+        stateTransition.set(launchPending, Bool.FALSE);
         stateTransition.set(isSearchFinished, Bool.TRUE);
-        stateTransition.not(appLaunchPending, Bool.TRUE);
+        stateTransition.not(launchPending, Bool.TRUE);
         stateTransition.not(isSearchFinished, Bool.FALSE);
         return stateTransition;
     }
 
-    private void checkAtScreen(GStateTransition stateTransition, Element element) {
+    private void checkAtScreen(StateTransition stateTransition, Element element) {
         HierarchyInfo hierarchyInfo = get(HierarchyInfo.class);
         if (hierarchyInfo.belongsToScreen(element)) {
             Screen screen = hierarchyInfo.screenOf(element);
             stateTransition.check(screenChecked, screen);
             stateTransition.check(at, screen);
-        } else {
+        } else if (hierarchyInfo.belongsToPager(element)) {
             PagerElement pagerElement = hierarchyInfo.pagerOf(element);
             checkAtScreen(stateTransition, pagerElement);
         }
     }
 
-    private void checkAtScreen(GStateTransition stateTransition, PagerElement element) {
+    private void checkAtScreen(StateTransition stateTransition, PagerElement element) {
         HierarchyInfo hierarchyInfo = get(HierarchyInfo.class);
-        Screen screen = hierarchyInfo.screenOf(element);
-        stateTransition.check(screenChecked, screen);
-        stateTransition.check(at, screen);
+        if (hierarchyInfo.belongsToScreen(element)) {
+            Screen screen = hierarchyInfo.screenOf(element);
+            stateTransition.check(screenChecked, screen);
+            stateTransition.check(at, screen);
+        }
     }
 }

@@ -5,14 +5,12 @@ import com.drk.tools.gplannercore.core.Atom;
 
 public class MainAtoms {
 
-    public static MockRequestPending mockRequestPending = new MockRequestPending();
-    public static MockInjectionPending mockInjectionPending = new MockInjectionPending();
-    public static AppLaunchPending appLaunchPending = new AppLaunchPending();
+    public static MockPending mockPending = new MockPending();
+    public static LaunchPending launchPending = new LaunchPending();
     public static ScreenNavigationPending screenNavigationPending = new ScreenNavigationPending();
     public static IsSearchFinished isSearchFinished = new IsSearchFinished();
 
-    public static MockedInjection mockedInjection = new MockedInjection();
-    public static MockedRequest mockedRequest = new MockedRequest();
+    public static Mocked mocked = new Mocked();
     public static At at = new At();
     public static NavigateTo navigateTo = new NavigateTo();
     public static ScreenChecked screenChecked = new ScreenChecked();
@@ -23,23 +21,15 @@ public class MainAtoms {
     public static ElementTextSet elementTextSet = new ElementTextSet();
     public static BackAt backAt = new BackAt();
 
-    public static class MockRequestPending extends Atom<Bool> {
+    public static class MockPending extends Atom<Bool> {
 
     }
 
-    public static class MockInjectionPending extends Atom<Bool> {
+    public static class Mocked extends Atom<Mock> {
 
     }
 
-    public static class MockedRequest extends Atom<Request> {
-
-    }
-
-    public static class MockedInjection extends Atom<Injection> {
-
-    }
-
-    public static class AppLaunchPending extends Atom<Bool> {
+    public static class LaunchPending extends Atom<Bool> {
 
     }
 
