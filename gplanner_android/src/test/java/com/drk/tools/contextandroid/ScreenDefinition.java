@@ -1,5 +1,6 @@
 package com.drk.tools.contextandroid;
 
+import com.drk.tools.contextandroid.domain.AndroidViewInfo;
 import com.drk.tools.contextandroid.domain.NavigationInfo;
 import com.drk.tools.contextandroid.domain.ScreenInfo;
 import com.drk.tools.contextandroid.domain.ViewInfo;

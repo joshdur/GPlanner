@@ -1,8 +1,5 @@
-package com.drk.tools.contextandroid;
+package com.drk.tools.contextandroid.domain;
 
-import com.drk.tools.contextandroid.domain.PagerInfo;
-import com.drk.tools.contextandroid.domain.ScreenInfo;
-import com.drk.tools.contextandroid.domain.ViewInfo;
 import com.drk.tools.contextandroid.planner.variables.Element;
 import com.drk.tools.contextandroid.planner.variables.Mock;
 import com.drk.tools.contextandroid.planner.variables.PagerElement;
@@ -12,10 +9,10 @@ import java.util.*;
 
 public class AndroidViewInfo {
 
-    final HashMap<Screen, ScreenInfo> mapScreens;
-    final HashMap<Element, ViewInfo> mapElements;
-    final HashMap<PagerElement, PagerInfo> mapPagers;
-    final HashMap<Mock, Enum> mapMocks;
+    public final HashMap<Screen, ScreenInfo> mapScreens;
+    public final HashMap<Element, ViewInfo> mapElements;
+    public final HashMap<PagerElement, PagerInfo> mapPagers;
+    public final HashMap<Mock, Enum> mapMocks;
 
     public static Builder builder() {
         return new Builder();
@@ -29,7 +26,7 @@ public class AndroidViewInfo {
 
     }
 
-    Element findElementWithId(int resId) {
+    public Element findElementWithId(int resId) {
         for (Map.Entry<Element, ViewInfo> entry : mapElements.entrySet()) {
             ViewInfo viewInfo = entry.getValue();
             if (viewInfo.id == resId) {
@@ -39,7 +36,7 @@ public class AndroidViewInfo {
         throw new IllegalStateException("Element with " + resId + " not found while building TextInfo");
     }
 
-    Screen findScreenByName(String name) {
+    public Screen findScreenByName(String name) {
         for (Map.Entry<Screen, ScreenInfo> entry : mapScreens.entrySet()) {
             if (entry.getValue().name.equalsIgnoreCase(name)) {
                 return entry.getKey();
@@ -48,7 +45,7 @@ public class AndroidViewInfo {
         throw new IllegalStateException("Not found screenInfo for " + name);
     }
 
-    Mock findMockByEnum(Enum mock) {
+    public Mock findMockByEnum(Enum mock) {
         for (Map.Entry<Mock, Enum> entry : mapMocks.entrySet()) {
             if (entry.getValue().equals(mock)) {
                 return entry.getKey();

@@ -1,9 +1,6 @@
 package com.drk.tools.contextandroid;
 
-import com.drk.tools.contextandroid.domain.NavigationInfo;
-import com.drk.tools.contextandroid.domain.PagerInfo;
-import com.drk.tools.contextandroid.domain.ScreenInfo;
-import com.drk.tools.contextandroid.domain.ViewInfo;
+import com.drk.tools.contextandroid.domain.*;
 import com.drk.tools.contextandroid.planner.domain.*;
 import com.drk.tools.contextandroid.planner.variables.Bool;
 import com.drk.tools.contextandroid.planner.variables.Element;
@@ -19,17 +16,17 @@ import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.screenNavigat
 
 class InfoBuilder {
 
-    static TextInfo getTextInfo(AndroidViewInfo androidViewInfo, PathTokens pathTokens) {
-        HashMap<Element, String> textsToCheck = getHashElementString(androidViewInfo, pathTokens.textToCheck);
-        HashMap<Element, String> textsToInput = getHashElementString(androidViewInfo, pathTokens.textToInput);
+    static TextInfo getTextInfo(AndroidViewInfo androidViewInfo, Scenario scenario) {
+        HashMap<Element, String> textsToCheck = getHashElementString(androidViewInfo, scenario.textToCheck);
+        HashMap<Element, String> textsToInput = getHashElementString(androidViewInfo, scenario.textToInput);
         return new TextInfo(textsToCheck, textsToInput);
     }
 
-    private static HashMap<Element, String> getHashElementString(AndroidViewInfo androidViewInfo, Collection<IdText> idTexts) {
+    private static HashMap<Element, String> getHashElementString(AndroidViewInfo androidViewInfo, Collection<ElementText> elementTexts) {
         HashMap<Element, String> hashElementString = new LinkedHashMap<>();
-        for (IdText idText : idTexts) {
-            Element element = androidViewInfo.findElementWithId(idText.resId);
-            hashElementString.put(element, idText.text);
+        for (ElementText elementText : elementTexts) {
+            Element element = androidViewInfo.findElementWithId(elementText.resId);
+            hashElementString.put(element, elementText.text);
         }
         return hashElementString;
     }
@@ -109,7 +106,13 @@ class InfoBuilder {
 
     static InitInfo getInitInfo(AndroidViewInfo androidViewInfo) {
         List<Screen> screens = new ArrayList<>(androidViewInfo.mapScreens.keySet());
-        return new InitInfo(!screens.isEmpty() ? screens.get(0) : null);
+        if (!screens.isEmpty()) {
+            Screen screen = screens.get(0);
+            ScreenInfo screenInfo = androidViewInfo.mapScreens.get(screen);
+            String screenName = screenInfo.name;
+            return new InitInfo(screen, screenName);
+        }
+        return new InitInfo(null, null);
     }
 
     private static <A, B> HashMap<B, A> inverse(HashMap<A, B> hash) {

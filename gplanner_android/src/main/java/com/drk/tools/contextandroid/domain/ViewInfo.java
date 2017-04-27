@@ -4,13 +4,11 @@ public class ViewInfo {
 
     public final int id;
     public final String text;
-    public final String inputText;
     public final NavigationInfo navigationInfo;
 
     private ViewInfo(Builder builder) {
         this.id = builder.id;
         this.text = builder.text;
-        this.inputText = builder.inputText;
         this.navigationInfo = builder.navigationInfo;
     }
 
@@ -26,7 +24,6 @@ public class ViewInfo {
 
         private final int id;
         private String text;
-        private String inputText;
         private NavigationInfo navigationInfo;
 
         Builder(int id) {
@@ -35,11 +32,6 @@ public class ViewInfo {
 
         public Builder text(String text) {
             this.text = text;
-            return this;
-        }
-
-        public Builder inputText(String inputText) {
-            this.inputText = inputText;
             return this;
         }
 

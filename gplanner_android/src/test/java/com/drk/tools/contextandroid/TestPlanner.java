@@ -1,20 +1,18 @@
 package com.drk.tools.contextandroid;
 
-import com.drk.tools.gplannercore.core.Plan;
+import com.drk.tools.contextandroid.domain.Scenario;
 import org.junit.Test;
-
-import java.util.List;
 
 public class TestPlanner {
 
     @Test
-    public void testPlanner() {
-        AndroidViewPlanner planner = new AndroidViewPlanner(ScreenDefinition.build(), true);
-        PathTokens pathTokens = PathTokens.builder()
+    public void testPlanner() throws Throwable {
+        AppChecker planner = new AppChecker(ScreenDefinition.build(), new TestAndroidSystem(), true);
+        Scenario scenario = Scenario.builder()
                 .mock(MyMocks.TEST1)
                 .clicked(1)
                 .checkAt(ScreenDefinition.SCREEN_NEWS_DETAILS)
                 .build();
-        List<Plan> plans = planner.search(pathTokens);
+        planner.assertScenario(scenario, 3);
     }
 }

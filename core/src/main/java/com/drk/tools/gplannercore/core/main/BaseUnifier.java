@@ -2,7 +2,6 @@ package com.drk.tools.gplannercore.core.main;
 
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Transition;
-import com.drk.tools.gplannercore.planner.state.GStateTransition;
 
 import java.util.ArrayList;
 import java.util.List;

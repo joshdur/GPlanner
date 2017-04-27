@@ -21,4 +21,12 @@ public class TextInfo {
     public boolean isInputTextDefined(Element element) {
         return inputTexts.containsKey(element);
     }
+
+    public String getText(Element element) {
+        return texts.get(element);
+    }
+
+    public String getInputText(Element element) {
+        return inputTexts.get(element);
+    }
 }

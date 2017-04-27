@@ -10,7 +10,7 @@ import com.drk.tools.gplannercore.planner.state.debug.DebugStateTransition;
 
 import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.*;
 
-public class AndroidView extends Operators {
+public class AndroidOperators extends Operators {
 
     private <T> T get(Class<T> tClass) {
         return obtain(tClass.toString(), tClass);
