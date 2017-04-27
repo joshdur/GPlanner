@@ -4,12 +4,14 @@ import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.search.Searcher;
 import com.drk.tools.gplannercore.core.state.State;
+import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.planner.search.context.SearchContext;
 import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.UnifierBuilder;
+import com.drk.tools.gplannercore.planner.state.GStateTransition;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,14 +64,46 @@ public class GraphPlan implements Searcher {
     }
 
     private Layer expandLayer(Layer layer, Context context) {
-        Set<Statement> statements = new HashSet<>(layer.statements);
-        statements.addAll(transitionEffects(layer.applicableTransitions));
-        UnifierBuilder unifierBuilder = new OperatorUnifierBuilder(context);
-        SearchUnifier searchUnifier = unifierBuilder.from(statements, new HashSet<Statement>());
+        Set<Statement> statements = new HashSet<>(transitionEffects(layer.applicableTransitions));
+        statements.addAll(layer.statements);
         Set<Rel> statementExclusions = Mutex.mutexStatements(statements, layer);
-        Set<Transition> transitions = new HashSet<>(searchUnifier.all());
+        Set<Transition> transitions = getApplicableTransitions(statementExclusions, context, statements);
+        transitions.add(noopTransition(layer.statements));
         Set<Rel> transitionExclusions = Mutex.mutexTransitions(transitions, statementExclusions);
         return new Layer(layer, statementExclusions, statements, transitions, transitionExclusions);
+    }
+
+    private Transition noopTransition(Set<Statement> statements) {
+        StateTransition stateTransition = new GStateTransition();
+        stateTransition.setAll(statements);
+        return Transition.noop(stateTransition);
+    }
+
+    private Set<Transition> getApplicableTransitions(Set<Rel> statementExcludions, Context context, Set<Statement> statements) {
+        UnifierBuilder unifierBuilder = new OperatorUnifierBuilder(context);
+        SearchUnifier searchUnifier = unifierBuilder.from(statements, new HashSet<Statement>());
+        Set<Transition> transitions = new HashSet<>();
+        for (Transition transition : searchUnifier.all()) {
+            if (!hasMutexPreconditions(transition, statementExcludions)) {
+                transitions.add(transition);
+            }
+        }
+        return transitions;
+    }
+
+    private boolean hasMutexPreconditions(Transition transition, Set<Rel> statementExclusions) {
+        Set<Statement> preconds = transition.stateTransition.getPositivePreconditions();
+        for (Statement precond : preconds) {
+            for (Statement otherPrecond : preconds) {
+                if (!precond.equals(otherPrecond)) {
+                    Rel rel = new Rel(precond, otherPrecond);
+                    if (statementExclusions.contains(rel)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private Set<Statement> transitionEffects(Set<Transition> transitions) {
@@ -102,7 +136,8 @@ public class GraphPlan implements Searcher {
                 Layer otherLayer = (Layer) obj;
                 return statements.equals(otherLayer.statements)
                         && applicableTransitions.equals(otherLayer.applicableTransitions)
-                        && transitionExclusions.equals(otherLayer.transitionExclusions);
+                        && transitionExclusions.equals(otherLayer.transitionExclusions)
+                        && statementExclusions.equals(otherLayer.statementExclusions);
             }
             return super.equals(obj);
         }
@@ -128,7 +163,7 @@ public class GraphPlan implements Searcher {
             if (obj instanceof Rel) {
                 Rel otherRel = (Rel) obj;
                 return (one.equals(otherRel.one) && other.equals(otherRel.other))
-                        || one.equals(otherRel.other) || other.equals(otherRel.one);
+                        || (one.equals(otherRel.other) && other.equals(otherRel.one));
             }
             return false;
         }

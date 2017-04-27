@@ -2,9 +2,15 @@ package com.drk.tools.gplannercore.core.state;
 
 public class Transition {
 
+    private final static int NOOP_CODE = -7;
+
     public final int unifierCode;
     public final int variableStateCode;
     public final StateTransition stateTransition;
+
+    public static Transition noop(StateTransition transition) {
+        return new Transition(NOOP_CODE, 0, transition);
+    }
 
     public Transition(int unifierCode, int variableStateCode, StateTransition stateTransition) {
         this.unifierCode = unifierCode;
@@ -20,5 +26,9 @@ public class Transition {
     @Override
     public int hashCode() {
         return stateTransition.hashCode();
+    }
+
+    public boolean isNoop() {
+        return unifierCode == NOOP_CODE;
     }
 }

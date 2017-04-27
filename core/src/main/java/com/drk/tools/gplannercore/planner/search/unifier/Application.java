@@ -18,6 +18,9 @@ class Application {
     }
 
     boolean isApplicable(Transition transition) {
+        if (transition.isNoop()) {
+            return false;
+        }
         Set<Statement> negativeContained = containedNegativePreconditions(transition);
         return containsAllPositivePreconditions(transition)
                 && (negativeContained.isEmpty() || negative.containsAll(negativeContained));
