@@ -34,6 +34,13 @@ task sourcesJar(type: Jar) {
 bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    File localFile = getRootProject().file('local.properties')
+    if (localFile.exists()) {
+        Properties properties = new Properties()
+        properties.load(new FileInputStream(localFile))
+        user = properties['bintrayUser']
+        key = properties['bintrayApiKey']
+    }
     publications = ['compilerPublication']
     pkg {
         repo = 'joshdur'
