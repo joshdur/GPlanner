@@ -1,8 +1,6 @@
 package com.drk.tools.contextandroid;
 
-import com.drk.tools.contextandroid.domain.AndroidViewInfo;
-import com.drk.tools.contextandroid.domain.ElementText;
-import com.drk.tools.contextandroid.domain.Scenario;
+import com.drk.tools.contextandroid.domain.*;
 import com.drk.tools.contextandroid.planner.AndroidOperatorsContext;
 import com.drk.tools.contextandroid.planner.domain.*;
 import com.drk.tools.contextandroid.planner.variables.Bool;
@@ -16,8 +14,6 @@ import com.drk.tools.gplannercore.planner.PlanStream;
 import com.drk.tools.gplannercore.planner.Planner;
 import com.drk.tools.gplannercore.planner.search.forward.SimpleForward;
 import com.drk.tools.gplannercore.planner.search.graphplan.GraphPlan;
-import com.drk.tools.gplannercore.planner.search.hsp.HSP;
-import com.drk.tools.gplannercore.planner.search.hsp.heuristic.GraphPlanScore;
 import com.drk.tools.gplannercore.planner.state.GStateBuilder;
 import com.drk.tools.gplannercore.planner.state.debug.DebugStateBuilder;
 
@@ -85,8 +81,8 @@ public class AppChecker {
         bundle.set(HierarchyInfo.class.toString(), infoBuilder.getHierarchyInfo());
         bundle.set(InitInfo.class.toString(), infoBuilder.getInitInfo());
         bundle.set(TextInfo.class.toString(), infoBuilder.getTextInfo(scenario));
+        bundle.set(ElementStateInfo.class.toString(), infoBuilder.getElementStateInfo(scenario));
         bundle.set(SearchInfo.class.toString(), new SearchInfo(debug));
-        bundle.set(ExecutionInfo.class.toString(), new ExecutionInfo());
         return bundle;
     }
 
@@ -105,7 +101,7 @@ public class AppChecker {
         for (ElementText elementText : scenario.textToCheck) {
             builder.set(elementTextChecked, androidViewInfo.findElementWithId(elementText.resId));
         }
-        for (ElementText elementText : scenario.textToInput) {
+        for (ElementInputText elementText : scenario.textToInput) {
             builder.set(elementTextSet, androidViewInfo.findElementWithId(elementText.resId));
         }
         for (String screenName : scenario.ats) {
@@ -113,6 +109,9 @@ public class AppChecker {
         }
         for (int resId : scenario.clickeds) {
             builder.set(elementClicked, androidViewInfo.findElementWithId(resId));
+        }
+        for(ElementState elementState : scenario.elementStates) {
+            builder.set(elementStateChecked, androidViewInfo.findElementWithId(elementState.resId));
         }
         if (scenario.shouldMock()) {
             builder.set(mocked, androidViewInfo.findMockByEnum(scenario.mock));

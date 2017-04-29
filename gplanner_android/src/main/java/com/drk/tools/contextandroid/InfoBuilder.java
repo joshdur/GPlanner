@@ -23,16 +23,34 @@ class InfoBuilder {
     }
 
     TextInfo getTextInfo(Scenario scenario) {
-        HashMap<Element, String> textsToCheck = getHashElementString(scenario.textToCheck);
-        HashMap<Element, String> textsToInput = getHashElementString(scenario.textToInput);
+        HashMap<Element, ElementText> textsToCheck = getHashElementText(scenario.textToCheck);
+        HashMap<Element, ElementInputText> textsToInput = getHashElementInputText(scenario.textToInput);
         return new TextInfo(textsToCheck, textsToInput);
     }
 
-    private HashMap<Element, String> getHashElementString(Collection<ElementText> elementTexts) {
-        HashMap<Element, String> hashElementString = new LinkedHashMap<>();
+    ElementStateInfo getElementStateInfo(Scenario scenario) {
+        HashMap<Element, ElementState> hashElementState = new LinkedHashMap<>();
+        for(ElementState elementState : scenario.elementStates){
+            Element element = info.findElementWithId(elementState.resId);
+            hashElementState.put(element, elementState);
+        }
+        return new ElementStateInfo(hashElementState);
+    }
+
+    private  HashMap<Element, ElementText> getHashElementText(Collection<ElementText> elementTexts) {
+        HashMap<Element, ElementText> hashElementString = new LinkedHashMap<>();
         for (ElementText elementText : elementTexts) {
             Element element = info.findElementWithId(elementText.resId);
-            hashElementString.put(element, elementText.text);
+            hashElementString.put(element, elementText);
+        }
+        return hashElementString;
+    }
+
+    private HashMap<Element, ElementInputText> getHashElementInputText(Collection<ElementInputText> elementTexts) {
+        HashMap<Element, ElementInputText> hashElementString = new LinkedHashMap<>();
+        for (ElementInputText elementInputText : elementTexts) {
+            Element element = info.findElementWithId(elementInputText.resId);
+            hashElementString.put(element, elementInputText);
         }
         return hashElementString;
     }
@@ -136,6 +154,7 @@ class InfoBuilder {
         return new InitInfo(null, null);
     }
 
+
     private <A extends Atom<E>, E extends Enum> Statement buildStatement(A atom, E variable) {
         if (debug) {
             return DebugStatement.from(atom, variable);
@@ -150,4 +169,6 @@ class InfoBuilder {
         }
         return inverse;
     }
+
+
 }

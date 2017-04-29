@@ -17,6 +17,7 @@ public class MainAtoms {
     public static IntentChecked intentChecked = new IntentChecked();
     public static ScreenChecked screenChecked = new ScreenChecked();
     public static ElementVisible elementVisible = new ElementVisible();
+    public static ElementStateChecked elementStateChecked = new ElementStateChecked();
     public static PagerElementVisible pagerElementVisible = new PagerElementVisible();
     public static ElementTextChecked elementTextChecked = new ElementTextChecked();
     public static ElementClicked elementClicked = new ElementClicked();
@@ -65,6 +66,10 @@ public class MainAtoms {
     }
 
     public static class ElementVisible extends Atom<Element> {
+
+    }
+
+    public static class ElementStateChecked extends Atom<Element> {
 
     }
 

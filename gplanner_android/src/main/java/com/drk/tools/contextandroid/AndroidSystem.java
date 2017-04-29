@@ -1,8 +1,6 @@
 package com.drk.tools.contextandroid;
 
-import com.drk.tools.contextandroid.domain.IntentData;
-import com.drk.tools.contextandroid.domain.ScreenInfo;
-import com.drk.tools.contextandroid.domain.ViewInfo;
+import com.drk.tools.contextandroid.domain.*;
 
 public interface AndroidSystem {
 
@@ -16,9 +14,11 @@ public interface AndroidSystem {
 
     void checkVisibility(ViewInfo viewInfo);
 
-    void checkText(ViewInfo viewInfo, String text);
+    void checkElementState(ElementState elementState);
 
-    void inputText(ViewInfo viewInfo, String text);
+    void checkText(ViewInfo viewInfo, ElementText text);
+
+    void inputText(ViewInfo viewInfo, ElementInputText text);
 
     void clickElement(ViewInfo viewInfo);
 

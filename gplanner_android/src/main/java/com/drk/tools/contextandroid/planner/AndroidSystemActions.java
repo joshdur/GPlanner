@@ -2,6 +2,7 @@ package com.drk.tools.contextandroid.planner;
 
 import com.drk.tools.contextandroid.AndroidSystem;
 import com.drk.tools.contextandroid.domain.*;
+import com.drk.tools.contextandroid.planner.domain.ElementStateInfo;
 import com.drk.tools.contextandroid.planner.domain.InitInfo;
 import com.drk.tools.contextandroid.planner.domain.SearchInfo;
 import com.drk.tools.contextandroid.planner.domain.TextInfo;
@@ -98,6 +99,20 @@ public class AndroidSystemActions extends SystemActions {
     }
 
     @SystemAction
+    public StateTransition checkElementState(Element element) {
+        final ElementStateInfo elementStateInfo = get(ElementStateInfo.class);
+        final ElementState elementState = elementStateInfo.getElementState(element);
+        planStr.append(String.format("checkElementState %d |", elementState.resId));
+        runnables.add(new Runnable() {
+            @Override
+            public void run() {
+                system().checkElementState(elementState);
+            }
+        });
+        return newTransition();
+    }
+
+    @SystemAction
     public StateTransition checkPagerVisibility(PagerElement pagerElement) {
         AndroidViewInfo androidViewInfo = get(AndroidViewInfo.class);
         PagerInfo pagerInfo = androidViewInfo.mapPagers.get(pagerElement);
@@ -118,7 +133,7 @@ public class AndroidSystemActions extends SystemActions {
         AndroidViewInfo androidViewInfo = get(AndroidViewInfo.class);
         TextInfo textInfo = get(TextInfo.class);
         final ViewInfo viewInfo = androidViewInfo.mapElements.get(element);
-        final String textToCheck = textInfo.getText(element);
+        final ElementText textToCheck = textInfo.getText(element);
         planStr.append(String.format("checkText %d is %s|", viewInfo.id, textToCheck));
         runnables.add(new Runnable() {
             @Override
@@ -134,12 +149,12 @@ public class AndroidSystemActions extends SystemActions {
         AndroidViewInfo androidViewInfo = get(AndroidViewInfo.class);
         final ViewInfo viewInfo = androidViewInfo.mapElements.get(element);
         TextInfo textInfo = get(TextInfo.class);
-        final String inputText = textInfo.getInputText(element);
+        final ElementInputText inputText = textInfo.getInputText(element);
         planStr.append(String.format("inputText %d with %s|", viewInfo.id, inputText));
         runnables.add(new Runnable() {
             @Override
             public void run() {
-                system().checkText(viewInfo, inputText);
+                system().inputText(viewInfo, inputText);
             }
         });
         return newTransition();

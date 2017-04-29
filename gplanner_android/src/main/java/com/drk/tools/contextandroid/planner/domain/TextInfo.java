@@ -1,15 +1,17 @@
 package com.drk.tools.contextandroid.planner.domain;
 
+import com.drk.tools.contextandroid.domain.ElementInputText;
+import com.drk.tools.contextandroid.domain.ElementText;
 import com.drk.tools.contextandroid.planner.variables.Element;
 
 import java.util.HashMap;
 
 public class TextInfo {
 
-    private final HashMap<Element, String> texts;
-    private final HashMap<Element, String> inputTexts;
+    private final HashMap<Element, ElementText> texts;
+    private final HashMap<Element, ElementInputText> inputTexts;
 
-    public TextInfo(HashMap<Element, String> texts, HashMap<Element, String> inputTexts) {
+    public TextInfo(HashMap<Element, ElementText> texts, HashMap<Element, ElementInputText> inputTexts) {
         this.texts = texts;
         this.inputTexts = inputTexts;
     }
@@ -22,11 +24,11 @@ public class TextInfo {
         return inputTexts.containsKey(element);
     }
 
-    public String getText(Element element) {
+    public ElementText getText(Element element) {
         return texts.get(element);
     }
 
-    public String getInputText(Element element) {
+    public ElementInputText getInputText(Element element) {
         return inputTexts.get(element);
     }
 }

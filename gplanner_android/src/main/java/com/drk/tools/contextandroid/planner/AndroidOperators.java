@@ -115,6 +115,19 @@ public class AndroidOperators extends Operators {
     }
 
     @Operator
+    public StateTransition checkElementState(Element element) {
+        StateTransition stateTransition = newTransition();
+        AndroidViewInfo info = get(AndroidViewInfo.class);
+        if(info.mapElements.containsKey(element)) {
+            withAppLaunched(stateTransition);
+            noPendings(stateTransition);
+            checkAtScreen(stateTransition, element);
+            stateTransition.set(elementStateChecked, element);
+        }
+        return stateTransition;
+    }
+
+    @Operator
     public StateTransition checkPagerVisibility(PagerElement pagerElement) {
         StateTransition stateTransition = newTransition();
         AndroidViewInfo info = get(AndroidViewInfo.class);
