@@ -9,10 +9,12 @@ public class MainAtoms {
     public static LaunchPending launchPending = new LaunchPending();
     public static ScreenNavigationPending screenNavigationPending = new ScreenNavigationPending();
     public static IsSearchFinished isSearchFinished = new IsSearchFinished();
-
+    public static LaunchIntentPending launchIntentPending = new LaunchIntentPending();
     public static Mocked mocked = new Mocked();
     public static At at = new At();
     public static NavigateTo navigateTo = new NavigateTo();
+    public static IntentTo intentTo = new IntentTo();
+    public static IntentChecked intentChecked = new IntentChecked();
     public static ScreenChecked screenChecked = new ScreenChecked();
     public static ElementVisible elementVisible = new ElementVisible();
     public static PagerElementVisible pagerElementVisible = new PagerElementVisible();
@@ -37,6 +39,11 @@ public class MainAtoms {
 
     }
 
+    public static class LaunchIntentPending extends Atom<Bool> {
+
+    }
+
+
     public static class IsSearchFinished extends Atom<Bool> {
 
     }
@@ -46,6 +53,14 @@ public class MainAtoms {
     }
 
     public static class NavigateTo extends Atom<Screen> {
+
+    }
+
+    public static class IntentTo extends Atom<Intent> {
+
+    }
+
+    public static class IntentChecked extends Atom<Intent> {
 
     }
 

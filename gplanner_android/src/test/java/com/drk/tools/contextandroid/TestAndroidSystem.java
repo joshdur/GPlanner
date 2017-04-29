@@ -1,5 +1,6 @@
 package com.drk.tools.contextandroid;
 
+import com.drk.tools.contextandroid.domain.IntentData;
 import com.drk.tools.contextandroid.domain.ScreenInfo;
 import com.drk.tools.contextandroid.domain.ViewInfo;
 
@@ -12,6 +13,11 @@ public class TestAndroidSystem implements AndroidSystem {
     @Override
     public void launchApp(ScreenInfo screenInfo) {
         System.out.print("launchApp - ");
+    }
+
+    @Override
+    public void checkIntent(IntentData intentData) {
+        System.out.print("checkIntent - ");
     }
 
     @Override

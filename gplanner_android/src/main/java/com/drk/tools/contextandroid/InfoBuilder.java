@@ -2,43 +2,49 @@ package com.drk.tools.contextandroid;
 
 import com.drk.tools.contextandroid.domain.*;
 import com.drk.tools.contextandroid.planner.domain.*;
-import com.drk.tools.contextandroid.planner.variables.Bool;
-import com.drk.tools.contextandroid.planner.variables.Element;
-import com.drk.tools.contextandroid.planner.variables.PagerElement;
-import com.drk.tools.contextandroid.planner.variables.Screen;
+import com.drk.tools.contextandroid.planner.variables.*;
+import com.drk.tools.gplannercore.core.Atom;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.planner.state.GStatement;
+import com.drk.tools.gplannercore.planner.state.debug.DebugStatement;
 
 import java.util.*;
 
-import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.navigateTo;
-import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.screenNavigationPending;
+import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.*;
 
 class InfoBuilder {
 
-    static TextInfo getTextInfo(AndroidViewInfo androidViewInfo, Scenario scenario) {
-        HashMap<Element, String> textsToCheck = getHashElementString(androidViewInfo, scenario.textToCheck);
-        HashMap<Element, String> textsToInput = getHashElementString(androidViewInfo, scenario.textToInput);
+    private final AndroidViewInfo info;
+    private final boolean debug;
+
+    InfoBuilder(AndroidViewInfo info, boolean debug) {
+        this.info = info;
+        this.debug = debug;
+    }
+
+    TextInfo getTextInfo(Scenario scenario) {
+        HashMap<Element, String> textsToCheck = getHashElementString(scenario.textToCheck);
+        HashMap<Element, String> textsToInput = getHashElementString(scenario.textToInput);
         return new TextInfo(textsToCheck, textsToInput);
     }
 
-    private static HashMap<Element, String> getHashElementString(AndroidViewInfo androidViewInfo, Collection<ElementText> elementTexts) {
+    private HashMap<Element, String> getHashElementString(Collection<ElementText> elementTexts) {
         HashMap<Element, String> hashElementString = new LinkedHashMap<>();
         for (ElementText elementText : elementTexts) {
-            Element element = androidViewInfo.findElementWithId(elementText.resId);
+            Element element = info.findElementWithId(elementText.resId);
             hashElementString.put(element, elementText.text);
         }
         return hashElementString;
     }
 
 
-    static HierarchyInfo getHierarchyInfo(AndroidViewInfo androidViewInfo) {
-        HashMap<ViewInfo, Element> inverseMapElements = inverse(androidViewInfo.mapElements);
-        HashMap<PagerInfo, PagerElement> inverseMapPagers = inverse(androidViewInfo.mapPagers);
+    HierarchyInfo getHierarchyInfo() {
+        HashMap<ViewInfo, Element> inverseMapElements = inverse(info.mapElements);
+        HashMap<PagerInfo, PagerElement> inverseMapPagers = inverse(info.mapPagers);
 
         HashMap<Element, HierarchyInfo.Parent> hashParents = new LinkedHashMap<>();
         HashMap<PagerElement, HierarchyInfo.Parent> hashPagerParents = new LinkedHashMap<>();
-        for (Map.Entry<Screen, ScreenInfo> entry : androidViewInfo.mapScreens.entrySet()) {
+        for (Map.Entry<Screen, ScreenInfo> entry : info.mapScreens.entrySet()) {
             Screen screen = entry.getKey();
             ScreenInfo screenInfo = entry.getValue();
             for (ViewInfo viewInfo : screenInfo.views) {
@@ -60,59 +66,81 @@ class InfoBuilder {
         return new HierarchyInfo(hashParents, hashPagerParents);
     }
 
-    static BackInfo getBackInfo(AndroidViewInfo androidViewInfo) {
+    BackInfo getBackInfo() {
 
         HashMap<Screen, Screen> backData = new LinkedHashMap<>();
-        for (Map.Entry<Screen, ScreenInfo> entry : androidViewInfo.mapScreens.entrySet()) {
+        for (Map.Entry<Screen, ScreenInfo> entry : info.mapScreens.entrySet()) {
             ScreenInfo screenInfo = entry.getValue();
             if (screenInfo.hashBackInfo()) {
                 String screenName = screenInfo.back.screenName;
-                backData.put(entry.getKey(), androidViewInfo.findScreenByName(screenName));
+                backData.put(entry.getKey(), info.findScreenByName(screenName));
             }
         }
         return new BackInfo(backData);
     }
 
-    private static ActionInfo.ActionData solveActionData(NavigationInfo navigationInfo, AndroidViewInfo androidViewInfo) {
-        String screenName = navigationInfo.screenName;
-        return navigationTo(screenName, androidViewInfo);
+    private ActionInfo.ActionData solveActionData(Action action) {
+        if (action.type == Action.Type.CHANGE_SCREEN) {
+            return navigationTo(action.screenName);
+        } else if (action.type == Action.Type.INTENT) {
+            return intentTo(action.intentData);
+        }
+        return null;
     }
 
-    private static ActionInfo.ActionData navigationTo(String screenName, AndroidViewInfo androidViewInfo) {
-        Screen screen = androidViewInfo.findScreenByName(screenName);
+    private ActionInfo.ActionData navigationTo(String screenName) {
+        Screen screen = info.findScreenByName(screenName);
         Set<Statement> preconds = new HashSet<>();
         Set<Statement> positiveEffects = new HashSet<>();
         Set<Statement> negativeEffects = new HashSet<>();
-        positiveEffects.add(GStatement.from(navigateTo, screen));
-        positiveEffects.add(GStatement.from(screenNavigationPending, Bool.TRUE));
+        positiveEffects.add(buildStatement(navigateTo, screen));
+        positiveEffects.add(buildStatement(screenNavigationPending, Bool.TRUE));
+        negativeEffects.add(buildStatement(screenNavigationPending, Bool.FALSE));
         return new ActionInfo.ActionData(preconds, positiveEffects, negativeEffects);
     }
 
+    private ActionInfo.ActionData intentTo(IntentData intentData) {
+        Intent intent = info.findIntentByName(intentData);
+        Set<Statement> preconds = new HashSet<>();
+        Set<Statement> positiveEffects = new HashSet<>();
+        Set<Statement> negativeEffects = new HashSet<>();
+        positiveEffects.add(buildStatement(intentTo, intent));
+        positiveEffects.add(buildStatement(launchIntentPending, Bool.TRUE));
+        negativeEffects.add(buildStatement(launchIntentPending, Bool.FALSE));
+        return new ActionInfo.ActionData(preconds, positiveEffects, negativeEffects);
+    }
 
-    static ActionInfo getActionInfo(AndroidViewInfo androidViewInfo) {
-
+    ActionInfo getActionInfo() {
         HashMap<Element, ActionInfo.ActionData> hashData = new LinkedHashMap<>();
-        for (Map.Entry<Element, ViewInfo> entry : androidViewInfo.mapElements.entrySet()) {
+        for (Map.Entry<Element, ViewInfo> entry : info.mapElements.entrySet()) {
             Element element = entry.getKey();
             ViewInfo viewInfo = entry.getValue();
             if (viewInfo.hasClickDefined()) {
-                String screenName = viewInfo.navigationInfo.screenName;
-                ActionInfo.ActionData actionData = solveActionData(viewInfo.navigationInfo, androidViewInfo);
-                hashData.put(element, actionData);
+                ActionInfo.ActionData actionData = solveActionData(viewInfo.action);
+                if (actionData != null) {
+                    hashData.put(element, actionData);
+                }
             }
         }
         return new ActionInfo(hashData);
     }
 
-    static InitInfo getInitInfo(AndroidViewInfo androidViewInfo) {
-        List<Screen> screens = new ArrayList<>(androidViewInfo.mapScreens.keySet());
+    InitInfo getInitInfo() {
+        List<Screen> screens = new ArrayList<>(info.mapScreens.keySet());
         if (!screens.isEmpty()) {
             Screen screen = screens.get(0);
-            ScreenInfo screenInfo = androidViewInfo.mapScreens.get(screen);
+            ScreenInfo screenInfo = info.mapScreens.get(screen);
             String screenName = screenInfo.name;
             return new InitInfo(screen, screenName);
         }
         return new InitInfo(null, null);
+    }
+
+    private <A extends Atom<E>, E extends Enum> Statement buildStatement(A atom, E variable) {
+        if (debug) {
+            return DebugStatement.from(atom, variable);
+        }
+        return GStatement.from(atom, variable);
     }
 
     private static <A, B> HashMap<B, A> inverse(HashMap<A, B> hash) {

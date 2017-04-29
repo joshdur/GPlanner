@@ -4,16 +4,16 @@ public class ViewInfo {
 
     public final int id;
     public final String text;
-    public final NavigationInfo navigationInfo;
+    public final Action action;
 
     private ViewInfo(Builder builder) {
         this.id = builder.id;
         this.text = builder.text;
-        this.navigationInfo = builder.navigationInfo;
+        this.action = builder.action;
     }
 
     public boolean hasClickDefined() {
-        return navigationInfo != null;
+        return action != null;
     }
 
     public static Builder builder(int id) {
@@ -24,7 +24,7 @@ public class ViewInfo {
 
         private final int id;
         private String text;
-        private NavigationInfo navigationInfo;
+        private Action action;
 
         Builder(int id) {
             this.id = id;
@@ -35,8 +35,8 @@ public class ViewInfo {
             return this;
         }
 
-        public Builder clickActionInfo(NavigationInfo navigationInfo) {
-            this.navigationInfo = navigationInfo;
+        public Builder click(Action action) {
+            this.action = action;
             return this;
         }
 

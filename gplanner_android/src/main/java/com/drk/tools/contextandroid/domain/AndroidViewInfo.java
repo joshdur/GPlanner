@@ -1,9 +1,6 @@
 package com.drk.tools.contextandroid.domain;
 
-import com.drk.tools.contextandroid.planner.variables.Element;
-import com.drk.tools.contextandroid.planner.variables.Mock;
-import com.drk.tools.contextandroid.planner.variables.PagerElement;
-import com.drk.tools.contextandroid.planner.variables.Screen;
+import com.drk.tools.contextandroid.planner.variables.*;
 
 import java.util.*;
 
@@ -13,6 +10,7 @@ public class AndroidViewInfo {
     public final HashMap<Element, ViewInfo> mapElements;
     public final HashMap<PagerElement, PagerInfo> mapPagers;
     public final HashMap<Mock, Enum> mapMocks;
+    public final HashMap<Intent, IntentData> mapIntents;
 
     public static Builder builder() {
         return new Builder();
@@ -23,7 +21,7 @@ public class AndroidViewInfo {
         mapElements = builder.mapElements;
         mapPagers = builder.mapPagers;
         mapMocks = builder.mapMocks;
-
+        mapIntents = builder.mapIntents;
     }
 
     public Element findElementWithId(int resId) {
@@ -54,6 +52,15 @@ public class AndroidViewInfo {
         throw new IllegalStateException("Not found mockInfo for " + mock.name());
     }
 
+    public Intent findIntentByName(IntentData intentData) {
+        for (Map.Entry<Intent, IntentData> entry : mapIntents.entrySet()) {
+            if (entry.getValue().equals(intentData)) {
+                return entry.getKey();
+            }
+        }
+        throw new IllegalStateException("Not found Intent for " + intentData.toString());
+    }
+
 
     public static class Builder {
 
@@ -61,12 +68,14 @@ public class AndroidViewInfo {
         private HashMap<Element, ViewInfo> mapElements;
         private HashMap<PagerElement, PagerInfo> mapPagers;
         private HashMap<Mock, Enum> mapMocks;
+        private HashMap<Intent, IntentData> mapIntents;
 
         private Builder() {
             mapScreens = new LinkedHashMap<>();
             mapElements = new LinkedHashMap<>();
             mapPagers = new LinkedHashMap<>();
             mapMocks = new LinkedHashMap<>();
+            mapIntents = new LinkedHashMap<>();
         }
 
         public Builder addScreen(ScreenInfo screenInfo) {
@@ -84,6 +93,9 @@ public class AndroidViewInfo {
         private void addViewInfos(Collection<ViewInfo> viewInfos) {
             for (ViewInfo info : viewInfos) {
                 mapElements.put(Element.values()[mapElements.size()], info);
+                if(info.hasClickDefined() && info.action.type == Action.Type.INTENT){
+                    mapIntents.put(Intent.values()[mapIntents.size()], info.action.intentData);
+                }
             }
         }
 

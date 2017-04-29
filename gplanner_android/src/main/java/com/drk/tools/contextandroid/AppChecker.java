@@ -14,6 +14,7 @@ import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.StateBuilder;
 import com.drk.tools.gplannercore.planner.PlanStream;
 import com.drk.tools.gplannercore.planner.Planner;
+import com.drk.tools.gplannercore.planner.search.forward.SimpleForward;
 import com.drk.tools.gplannercore.planner.search.graphplan.GraphPlan;
 import com.drk.tools.gplannercore.planner.search.hsp.HSP;
 import com.drk.tools.gplannercore.planner.search.hsp.heuristic.GraphPlanScore;
@@ -29,11 +30,13 @@ public class AppChecker {
     private final AndroidViewInfo androidViewInfo;
     private final AndroidSystem androidSystem;
     private final boolean debug;
+    private final InfoBuilder infoBuilder;
 
     public AppChecker(AndroidViewInfo androidViewInfo, AndroidSystem androidSystem, boolean debug) {
         this.androidViewInfo = androidViewInfo;
         this.androidSystem = androidSystem;
         this.debug = debug;
+        this.infoBuilder = new InfoBuilder(androidViewInfo, debug);
     }
 
     public AppChecker(AndroidViewInfo androidViewInfo, AndroidSystem androidSystem) {
@@ -77,11 +80,11 @@ public class AppChecker {
         Bundle bundle = new Bundle();
         bundle.set(AndroidSystem.class.toString(), androidSystem);
         bundle.set(AndroidViewInfo.class.toString(), androidViewInfo);
-        bundle.set(ActionInfo.class.toString(), InfoBuilder.getActionInfo(androidViewInfo));
-        bundle.set(BackInfo.class.toString(), InfoBuilder.getBackInfo(androidViewInfo));
-        bundle.set(HierarchyInfo.class.toString(), InfoBuilder.getHierarchyInfo(androidViewInfo));
-        bundle.set(InitInfo.class.toString(), InfoBuilder.getInitInfo(androidViewInfo));
-        bundle.set(TextInfo.class.toString(), InfoBuilder.getTextInfo(androidViewInfo, scenario));
+        bundle.set(ActionInfo.class.toString(), infoBuilder.getActionInfo());
+        bundle.set(BackInfo.class.toString(), infoBuilder.getBackInfo());
+        bundle.set(HierarchyInfo.class.toString(), infoBuilder.getHierarchyInfo());
+        bundle.set(InitInfo.class.toString(), infoBuilder.getInitInfo());
+        bundle.set(TextInfo.class.toString(), infoBuilder.getTextInfo(scenario));
         bundle.set(SearchInfo.class.toString(), new SearchInfo(debug));
         bundle.set(ExecutionInfo.class.toString(), new ExecutionInfo());
         return bundle;
@@ -93,6 +96,7 @@ public class AppChecker {
         builder.set(mockPending, scenario.shouldMock() ? Bool.TRUE : Bool.FALSE);
         builder.set(isSearchFinished, Bool.FALSE);
         builder.set(screenNavigationPending, Bool.FALSE);
+        builder.set(launchIntentPending, Bool.FALSE);
         return builder.build();
     }
 
@@ -114,6 +118,7 @@ public class AppChecker {
             builder.set(mocked, androidViewInfo.findMockByEnum(scenario.mock));
         }
         builder.set(isSearchFinished, Bool.TRUE);
+        builder.set(launchIntentPending, Bool.FALSE);
         return builder.build();
     }
 
@@ -122,6 +127,7 @@ public class AppChecker {
     }
 
     private Searcher buildSearcher() {
-        return new GraphPlan(new HSP(new GraphPlanScore()));
+        //return new SimpleForward();
+        return new GraphPlan(new SimpleForward(debug));
     }
 }

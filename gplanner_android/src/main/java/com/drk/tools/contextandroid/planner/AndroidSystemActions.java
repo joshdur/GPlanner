@@ -1,17 +1,11 @@
 package com.drk.tools.contextandroid.planner;
 
 import com.drk.tools.contextandroid.AndroidSystem;
-import com.drk.tools.contextandroid.domain.AndroidViewInfo;
-import com.drk.tools.contextandroid.domain.PagerInfo;
-import com.drk.tools.contextandroid.domain.ScreenInfo;
-import com.drk.tools.contextandroid.domain.ViewInfo;
+import com.drk.tools.contextandroid.domain.*;
 import com.drk.tools.contextandroid.planner.domain.InitInfo;
 import com.drk.tools.contextandroid.planner.domain.SearchInfo;
 import com.drk.tools.contextandroid.planner.domain.TextInfo;
-import com.drk.tools.contextandroid.planner.variables.Element;
-import com.drk.tools.contextandroid.planner.variables.Mock;
-import com.drk.tools.contextandroid.planner.variables.PagerElement;
-import com.drk.tools.contextandroid.planner.variables.Screen;
+import com.drk.tools.contextandroid.planner.variables.*;
 import com.drk.tools.gplannercore.annotations.SystemAction;
 import com.drk.tools.gplannercore.core.main.SystemActions;
 import com.drk.tools.gplannercore.core.state.StateTransition;
@@ -56,6 +50,20 @@ public class AndroidSystemActions extends SystemActions {
             @Override
             public void run() {
                 system().launchApp(startScreen);
+            }
+        });
+        return newTransition();
+    }
+
+    @SystemAction
+    public StateTransition checkIntent(Intent intent) {
+        AndroidViewInfo androidViewInfo = get(AndroidViewInfo.class);
+        final IntentData intentData = androidViewInfo.mapIntents.get(intent);
+        planStr.append(String.format("checkIntent %s |", intentData.toString()));
+        runnables.add(new Runnable() {
+            @Override
+            public void run() {
+                system().checkIntent(intentData);
             }
         });
         return newTransition();

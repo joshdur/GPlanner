@@ -35,27 +35,27 @@ public class Scenario {
         private final Set<Integer> clickeds = new HashSet<>();
         private Enum mock;
 
-        public Builder checkText(int resId, String text) {
+        public Builder withCheckedText(int resId, String text) {
             textToCheck.add(new ElementText(resId, text));
             return this;
         }
 
-        public Builder setText(int resId, String text) {
+        public Builder withInputText(int resId, String text) {
             textToInput.add(new ElementText(resId, text));
             return this;
         }
 
-        public Builder checkAt(String screenName) {
+        public Builder withCheckedScreen(String screenName) {
             ats.add(screenName);
             return this;
         }
 
-        public Builder clicked(int resId) {
+        public Builder withElementClicked(int resId) {
             clickeds.add(resId);
             return this;
         }
 
-        public Builder mock(Enum e) {
+        public Builder withMocked(Enum e) {
             mock = e;
             return this;
         }

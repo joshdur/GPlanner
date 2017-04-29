@@ -1,9 +1,6 @@
 package com.drk.tools.contextandroid;
 
-import com.drk.tools.contextandroid.domain.AndroidViewInfo;
-import com.drk.tools.contextandroid.domain.NavigationInfo;
-import com.drk.tools.contextandroid.domain.ScreenInfo;
-import com.drk.tools.contextandroid.domain.ViewInfo;
+import com.drk.tools.contextandroid.domain.*;
 
 public class ScreenDefinition {
 
@@ -21,7 +18,7 @@ public class ScreenDefinition {
     private static ScreenInfo listNewsScreen() {
         return ScreenInfo.builder(SCREEN_LIST_NEWS)
                 .addView(ViewInfo.builder(1)
-                        .clickActionInfo(NavigationInfo.changeToScreen(SCREEN_NEWS_DETAILS))
+                        .click(Action.changeToScreen(SCREEN_NEWS_DETAILS))
                         .build())
                 .build();
     }
@@ -29,8 +26,10 @@ public class ScreenDefinition {
 
     private static ScreenInfo newsDetailsScreen() {
         return ScreenInfo.builder(SCREEN_NEWS_DETAILS)
-                .addView(ViewInfo.builder(2).build())
-                .back(NavigationInfo.changeToScreen(SCREEN_LIST_NEWS))
+                .addView(ViewInfo.builder(2)
+                        .click(Action.launchIntent(IntentData.withAction("android.view")))
+                        .build())
+                .back(Action.changeToScreen(SCREEN_LIST_NEWS))
                 .build();
     }
 }

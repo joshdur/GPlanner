@@ -8,7 +8,7 @@ public class ScreenInfo {
     public final String name;
     public final List<ViewInfo> views;
     public final List<PagerInfo> pagers;
-    public final NavigationInfo back;
+    public final Action back;
 
     private ScreenInfo(Builder builder) {
         this.name = builder.name;
@@ -30,7 +30,7 @@ public class ScreenInfo {
         private final String name;
         private List<ViewInfo> views;
         private List<PagerInfo> pagers;
-        private NavigationInfo back;
+        private Action back;
 
         Builder(String name) {
             this.name = name;
@@ -48,8 +48,8 @@ public class ScreenInfo {
             return this;
         }
 
-        public Builder back(NavigationInfo navigationInfo) {
-            this.back = navigationInfo;
+        public Builder back(Action action) {
+            this.back = action;
             return this;
         }
 
