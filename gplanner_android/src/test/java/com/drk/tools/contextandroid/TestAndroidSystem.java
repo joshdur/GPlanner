@@ -29,7 +29,7 @@ public class TestAndroidSystem implements AndroidSystem {
     }
 
     @Override
-    public void checkElementState(ElementState elementState) {
+    public void checkElementState(ViewInfo viewInfo, ElementState elementState) {
         System.out.print("checkElementState - ");
     }
 

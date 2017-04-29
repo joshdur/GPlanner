@@ -100,13 +100,15 @@ public class AndroidSystemActions extends SystemActions {
 
     @SystemAction
     public StateTransition checkElementState(Element element) {
-        final ElementStateInfo elementStateInfo = get(ElementStateInfo.class);
+        ElementStateInfo elementStateInfo = get(ElementStateInfo.class);
+        AndroidViewInfo androidViewInfo = get(AndroidViewInfo.class);
+        final ViewInfo viewInfo = androidViewInfo.mapElements.get(element);
         final ElementState elementState = elementStateInfo.getElementState(element);
         planStr.append(String.format("checkElementState %d |", elementState.resId));
         runnables.add(new Runnable() {
             @Override
             public void run() {
-                system().checkElementState(elementState);
+                system().checkElementState(viewInfo, elementState);
             }
         });
         return newTransition();

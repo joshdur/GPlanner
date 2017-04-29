@@ -14,7 +14,7 @@ public interface AndroidSystem {
 
     void checkVisibility(ViewInfo viewInfo);
 
-    void checkElementState(ElementState elementState);
+    void checkElementState(ViewInfo viewInfo, ElementState elementState);
 
     void checkText(ViewInfo viewInfo, ElementText text);
 
