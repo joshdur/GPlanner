@@ -17,7 +17,8 @@ public class ScreenDefinition {
 
     private static ScreenInfo listNewsScreen() {
         return ScreenInfo.builder(SCREEN_LIST_NEWS)
-                .addView(ViewInfo.builder(1)
+                .addView(ViewInfo.builder()
+                        .id(1)
                         .click(Action.changeToScreen(SCREEN_NEWS_DETAILS))
                         .build())
                 .build();
@@ -26,7 +27,8 @@ public class ScreenDefinition {
 
     private static ScreenInfo newsDetailsScreen() {
         return ScreenInfo.builder(SCREEN_NEWS_DETAILS)
-                .addView(ViewInfo.builder(2)
+                .addView(ViewInfo.builder()
+                        .id(2)
                         .click(Action.launchIntent(IntentData.withAction("android.view")))
                         .build())
                 .back(Action.changeToScreen(SCREEN_LIST_NEWS))

@@ -99,19 +99,19 @@ public class AppChecker {
     private State finalState(Scenario scenario) {
         StateBuilder builder = stateBuilder();
         for (ElementText elementText : scenario.textToCheck) {
-            builder.set(elementTextChecked, androidViewInfo.findElementWithId(elementText.resId));
+            builder.set(elementTextChecked, androidViewInfo.findElementWithViewInfo(elementText.viewInfo));
         }
         for (ElementInputText elementText : scenario.textToInput) {
-            builder.set(elementTextSet, androidViewInfo.findElementWithId(elementText.resId));
+            builder.set(elementTextSet, androidViewInfo.findElementWithViewInfo(elementText.viewInfo));
         }
         for (String screenName : scenario.ats) {
             builder.set(screenChecked, androidViewInfo.findScreenByName(screenName));
         }
-        for (int resId : scenario.clickeds) {
-            builder.set(elementClicked, androidViewInfo.findElementWithId(resId));
+        for (ViewInfo info : scenario.clickeds) {
+            builder.set(elementClicked, androidViewInfo.findElementWithViewInfo(info));
         }
         for(ElementState elementState : scenario.elementStates) {
-            builder.set(elementStateChecked, androidViewInfo.findElementWithId(elementState.resId));
+            builder.set(elementStateChecked, androidViewInfo.findElementWithViewInfo(elementState.info));
         }
         if (scenario.shouldMock()) {
             builder.set(mocked, androidViewInfo.findMockByEnum(scenario.mock));

@@ -8,6 +8,7 @@ public class AndroidViewInfo {
 
     public final HashMap<Screen, ScreenInfo> mapScreens;
     public final HashMap<Element, ViewInfo> mapElements;
+    public final HashMap<Element, Boolean> mapPresentElements;
     public final HashMap<PagerElement, PagerInfo> mapPagers;
     public final HashMap<Mock, Enum> mapMocks;
     public final HashMap<Intent, IntentData> mapIntents;
@@ -19,19 +20,33 @@ public class AndroidViewInfo {
     private AndroidViewInfo(Builder builder) {
         mapScreens = builder.mapScreens;
         mapElements = builder.mapElements;
+        mapPresentElements = builder.mapPresentElements;
         mapPagers = builder.mapPagers;
         mapMocks = builder.mapMocks;
         mapIntents = builder.mapIntents;
     }
 
-    public Element findElementWithId(int resId) {
+    public boolean isPresent(Element element){
+       return mapPresentElements.containsKey(element) && mapPresentElements.get(element);
+    }
+
+    public boolean isPresent(PagerElement pagerElement){
+        return false;
+    }
+
+    public void setAsPresent(ViewInfo viewInfo){
+        Element element = findElementWithViewInfo(viewInfo);
+        mapPresentElements.put(element, true);
+    }
+
+    public Element findElementWithViewInfo(ViewInfo otherViewInfo) {
         for (Map.Entry<Element, ViewInfo> entry : mapElements.entrySet()) {
             ViewInfo viewInfo = entry.getValue();
-            if (viewInfo.id == resId) {
+            if(viewInfo.matches(otherViewInfo)){
                 return entry.getKey();
             }
         }
-        throw new IllegalStateException("Element with " + resId + " not found while building TextInfo");
+        throw new IllegalStateException(otherViewInfo.toString() + " not found in mapElements");
     }
 
     public Screen findScreenByName(String name) {
@@ -66,6 +81,7 @@ public class AndroidViewInfo {
 
         private HashMap<Screen, ScreenInfo> mapScreens;
         private HashMap<Element, ViewInfo> mapElements;
+        private HashMap<Element, Boolean> mapPresentElements;
         private HashMap<PagerElement, PagerInfo> mapPagers;
         private HashMap<Mock, Enum> mapMocks;
         private HashMap<Intent, IntentData> mapIntents;
@@ -73,6 +89,7 @@ public class AndroidViewInfo {
         private Builder() {
             mapScreens = new LinkedHashMap<>();
             mapElements = new LinkedHashMap<>();
+            mapPresentElements = new LinkedHashMap<>();
             mapPagers = new LinkedHashMap<>();
             mapMocks = new LinkedHashMap<>();
             mapIntents = new LinkedHashMap<>();
@@ -92,12 +109,26 @@ public class AndroidViewInfo {
 
         private void addViewInfos(Collection<ViewInfo> viewInfos) {
             for (ViewInfo info : viewInfos) {
-                mapElements.put(Element.values()[mapElements.size()], info);
-                if(info.hasClickDefined() && info.action.type == Action.Type.INTENT){
-                    mapIntents.put(Intent.values()[mapIntents.size()], info.action.intentData);
+                putElement(info, true);
+                if(info.hasClickDefined()){
+                    if(info.action.type == Action.Type.INTENT) {
+                        mapIntents.put(Intent.values()[mapIntents.size()], info.action.intentData);
+                    }
+                    if(info.action.type == Action.Type.ADD_VIEWS){
+                        for(ViewInfo onDemandViewInfo : info.action.viewInfos){
+                            putElement(onDemandViewInfo, false);
+                        }
+                    }
                 }
             }
         }
+
+        private void putElement(ViewInfo viewInfo, boolean isPresent) {
+            Element element = Element.values()[mapElements.size()];
+            mapElements.put(element, viewInfo);
+            mapPresentElements.put(element, isPresent);
+        }
+
 
         public Builder addMocks(Enum[] injections) {
             for (Enum e : injections) {

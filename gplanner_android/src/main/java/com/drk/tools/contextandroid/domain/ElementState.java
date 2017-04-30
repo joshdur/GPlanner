@@ -9,11 +9,11 @@ public class ElementState {
         NON_DISPLAYED
     }
 
-    public final int resId;
+    public final ViewInfo info;
     public final State state;
 
-    public ElementState(int resId, State state) {
-        this.resId = resId;
+    public ElementState(ViewInfo info, State state) {
+        this.info = info;
         this.state = state;
     }
 }

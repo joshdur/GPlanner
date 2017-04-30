@@ -104,7 +104,7 @@ public class AndroidSystemActions extends SystemActions {
         AndroidViewInfo androidViewInfo = get(AndroidViewInfo.class);
         final ViewInfo viewInfo = androidViewInfo.mapElements.get(element);
         final ElementState elementState = elementStateInfo.getElementState(element);
-        planStr.append(String.format("checkElementState %d |", elementState.resId));
+        planStr.append(String.format("checkElementState %s |", elementState.info.toString()));
         runnables.add(new Runnable() {
             @Override
             public void run() {
@@ -119,7 +119,7 @@ public class AndroidSystemActions extends SystemActions {
         AndroidViewInfo androidViewInfo = get(AndroidViewInfo.class);
         PagerInfo pagerInfo = androidViewInfo.mapPagers.get(pagerElement);
         planStr.append(String.format("checkVisibility %d |", pagerInfo.id));
-        final ViewInfo viewInfo = ViewInfo.builder(pagerInfo.id).build();
+        final ViewInfo viewInfo = ViewInfo.of(pagerInfo.id);
         runnables.add(new Runnable() {
             @Override
             public void run() {

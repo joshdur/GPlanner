@@ -2,15 +2,11 @@ package com.drk.tools.contextandroid;
 
 import com.drk.tools.contextandroid.domain.*;
 import com.drk.tools.contextandroid.planner.domain.*;
-import com.drk.tools.contextandroid.planner.variables.*;
-import com.drk.tools.gplannercore.core.Atom;
-import com.drk.tools.gplannercore.core.state.Statement;
-import com.drk.tools.gplannercore.planner.state.GStatement;
-import com.drk.tools.gplannercore.planner.state.debug.DebugStatement;
+import com.drk.tools.contextandroid.planner.variables.Element;
+import com.drk.tools.contextandroid.planner.variables.PagerElement;
+import com.drk.tools.contextandroid.planner.variables.Screen;
 
 import java.util.*;
-
-import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.*;
 
 class InfoBuilder {
 
@@ -23,38 +19,17 @@ class InfoBuilder {
     }
 
     TextInfo getTextInfo(Scenario scenario) {
-        HashMap<Element, ElementText> textsToCheck = getHashElementText(scenario.textToCheck);
-        HashMap<Element, ElementInputText> textsToInput = getHashElementInputText(scenario.textToInput);
-        return new TextInfo(textsToCheck, textsToInput);
+        return new TextInfo(scenario.textToCheck, scenario.textToInput, info);
     }
 
     ElementStateInfo getElementStateInfo(Scenario scenario) {
         HashMap<Element, ElementState> hashElementState = new LinkedHashMap<>();
-        for(ElementState elementState : scenario.elementStates){
-            Element element = info.findElementWithId(elementState.resId);
+        for (ElementState elementState : scenario.elementStates) {
+            Element element = info.findElementWithViewInfo(elementState.info);
             hashElementState.put(element, elementState);
         }
         return new ElementStateInfo(hashElementState);
     }
-
-    private  HashMap<Element, ElementText> getHashElementText(Collection<ElementText> elementTexts) {
-        HashMap<Element, ElementText> hashElementString = new LinkedHashMap<>();
-        for (ElementText elementText : elementTexts) {
-            Element element = info.findElementWithId(elementText.resId);
-            hashElementString.put(element, elementText);
-        }
-        return hashElementString;
-    }
-
-    private HashMap<Element, ElementInputText> getHashElementInputText(Collection<ElementInputText> elementTexts) {
-        HashMap<Element, ElementInputText> hashElementString = new LinkedHashMap<>();
-        for (ElementInputText elementInputText : elementTexts) {
-            Element element = info.findElementWithId(elementInputText.resId);
-            hashElementString.put(element, elementInputText);
-        }
-        return hashElementString;
-    }
-
 
     HierarchyInfo getHierarchyInfo() {
         HashMap<ViewInfo, Element> inverseMapElements = inverse(info.mapElements);
@@ -97,50 +72,17 @@ class InfoBuilder {
         return new BackInfo(backData);
     }
 
-    private ActionInfo.ActionData solveActionData(Action action) {
-        if (action.type == Action.Type.CHANGE_SCREEN) {
-            return navigationTo(action.screenName);
-        } else if (action.type == Action.Type.INTENT) {
-            return intentTo(action.intentData);
-        }
-        return null;
-    }
-
-    private ActionInfo.ActionData navigationTo(String screenName) {
-        Screen screen = info.findScreenByName(screenName);
-        Set<Statement> preconds = new HashSet<>();
-        Set<Statement> positiveEffects = new HashSet<>();
-        Set<Statement> negativeEffects = new HashSet<>();
-        positiveEffects.add(buildStatement(navigateTo, screen));
-        positiveEffects.add(buildStatement(screenNavigationPending, Bool.TRUE));
-        negativeEffects.add(buildStatement(screenNavigationPending, Bool.FALSE));
-        return new ActionInfo.ActionData(preconds, positiveEffects, negativeEffects);
-    }
-
-    private ActionInfo.ActionData intentTo(IntentData intentData) {
-        Intent intent = info.findIntentByName(intentData);
-        Set<Statement> preconds = new HashSet<>();
-        Set<Statement> positiveEffects = new HashSet<>();
-        Set<Statement> negativeEffects = new HashSet<>();
-        positiveEffects.add(buildStatement(intentTo, intent));
-        positiveEffects.add(buildStatement(launchIntentPending, Bool.TRUE));
-        negativeEffects.add(buildStatement(launchIntentPending, Bool.FALSE));
-        return new ActionInfo.ActionData(preconds, positiveEffects, negativeEffects);
-    }
 
     ActionInfo getActionInfo() {
-        HashMap<Element, ActionInfo.ActionData> hashData = new LinkedHashMap<>();
+        HashMap<Element, Action> hashData = new LinkedHashMap<>();
         for (Map.Entry<Element, ViewInfo> entry : info.mapElements.entrySet()) {
             Element element = entry.getKey();
             ViewInfo viewInfo = entry.getValue();
             if (viewInfo.hasClickDefined()) {
-                ActionInfo.ActionData actionData = solveActionData(viewInfo.action);
-                if (actionData != null) {
-                    hashData.put(element, actionData);
-                }
+                hashData.put(element, viewInfo.action);
             }
         }
-        return new ActionInfo(hashData);
+        return new ActionInfo(hashData, info, debug);
     }
 
     InitInfo getInitInfo() {
@@ -152,14 +94,6 @@ class InfoBuilder {
             return new InitInfo(screen, screenName);
         }
         return new InitInfo(null, null);
-    }
-
-
-    private <A extends Atom<E>, E extends Enum> Statement buildStatement(A atom, E variable) {
-        if (debug) {
-            return DebugStatement.from(atom, variable);
-        }
-        return GStatement.from(atom, variable);
     }
 
     private static <A, B> HashMap<B, A> inverse(HashMap<A, B> hash) {

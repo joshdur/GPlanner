@@ -105,7 +105,7 @@ public class AndroidOperators extends Operators {
     public StateTransition checkVisibility(Element element) {
         StateTransition stateTransition = newTransition();
         AndroidViewInfo info = get(AndroidViewInfo.class);
-        if(info.mapElements.containsKey(element)) {
+        if(info.isPresent(element)) {
             withAppLaunched(stateTransition);
             noPendings(stateTransition);
             checkAtScreen(stateTransition, element);
@@ -118,7 +118,7 @@ public class AndroidOperators extends Operators {
     public StateTransition checkElementState(Element element) {
         StateTransition stateTransition = newTransition();
         AndroidViewInfo info = get(AndroidViewInfo.class);
-        if(info.mapElements.containsKey(element)) {
+        if(info.isPresent(element)) {
             withAppLaunched(stateTransition);
             noPendings(stateTransition);
             checkAtScreen(stateTransition, element);
@@ -131,7 +131,7 @@ public class AndroidOperators extends Operators {
     public StateTransition checkPagerVisibility(PagerElement pagerElement) {
         StateTransition stateTransition = newTransition();
         AndroidViewInfo info = get(AndroidViewInfo.class);
-        if(info.mapPagers.containsKey(pagerElement)) {
+        if(info.isPresent(pagerElement)) {
             withAppLaunched(stateTransition);
             noPendings(stateTransition);
             checkAtScreen(stateTransition, pagerElement);
@@ -181,10 +181,7 @@ public class AndroidOperators extends Operators {
         ActionInfo actionInfo = get(ActionInfo.class);
         if (actionInfo.isActionDefined(element)) {
             stateTransition.check(elementVisible, element);
-            ActionInfo.ActionData actionData = actionInfo.actionOf(element);
-            stateTransition.checkAll(actionData.preconds);
-            stateTransition.setAll(actionData.positiveEffects);
-            stateTransition.notAll(actionData.negativeEffects);
+            actionInfo.solveAction(element, stateTransition);
             stateTransition.set(elementClicked, element);
         }
         return stateTransition;

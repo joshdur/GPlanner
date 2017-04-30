@@ -8,7 +8,7 @@ public class Scenario {
     public final Set<ElementText> textToCheck;
     public final Set<ElementInputText> textToInput;
     public final Set<String> ats;
-    public final Set<Integer> clickeds;
+    public final Set<ViewInfo> clickeds;
     public final Set<ElementState> elementStates;
     public final Enum mock;
 
@@ -34,31 +34,31 @@ public class Scenario {
         private final Set<ElementText> textToCheck = new HashSet<>();
         private final Set<ElementInputText> textToInput = new HashSet<>();
         private final Set<String> ats = new HashSet<>();
-        private final Set<Integer> clickeds = new HashSet<>();
+        private final Set<ViewInfo> clickeds = new HashSet<>();
         private final Set<ElementState> elementStates = new HashSet<>();
         private Enum mock;
 
-        public Builder withCheckedText(int resId, String text) {
-            textToCheck.add(new ElementText(resId, text, false, false));
+        public Builder withCheckedText(ViewInfo viewInfo, String text) {
+            textToCheck.add(new ElementText(viewInfo, text, false, false));
             return this;
         }
 
-        public Builder withContainedText(int resId, String text) {
-            textToCheck.add(new ElementText(resId, text, false, true));
+        public Builder withContainedText(ViewInfo viewInfo, String text) {
+            textToCheck.add(new ElementText(viewInfo, text, false, true));
             return this;
         }
-        public Builder withCheckedTextForAll(int resId, String text) {
-            textToCheck.add(new ElementText(resId, text, true, false));
-            return this;
-        }
-
-        public Builder withContainedTextForAll(int resId, String text) {
-            textToCheck.add(new ElementText(resId, text, true, true));
+        public Builder withCheckedTextForAll(ViewInfo viewInfo, String text) {
+            textToCheck.add(new ElementText(viewInfo, text, true, false));
             return this;
         }
 
-        public Builder withInputText(int resId, String text) {
-            textToInput.add(new ElementInputText(resId, text, false));
+        public Builder withContainedTextForAll(ViewInfo viewInfo, String text) {
+            textToCheck.add(new ElementText(viewInfo, text, true, true));
+            return this;
+        }
+
+        public Builder withInputText(ViewInfo viewInfo, String text) {
+            textToInput.add(new ElementInputText(viewInfo, text, false));
             return this;
         }
 
@@ -68,7 +68,12 @@ public class Scenario {
         }
 
         public Builder withElementClicked(int resId) {
-            clickeds.add(resId);
+            clickeds.add(ViewInfo.of(resId));
+            return this;
+        }
+
+        public Builder withElementClicked(ViewInfo viewInfo){
+            clickeds.add(viewInfo);
             return this;
         }
 
@@ -78,7 +83,12 @@ public class Scenario {
         }
 
         public Builder withElementState(int resId, ElementState.State state) {
-            elementStates.add(new ElementState(resId, state));
+            elementStates.add(new ElementState(ViewInfo.of(resId), state));
+            return this;
+        }
+
+        public Builder withElementState(ViewInfo info, ElementState.State state) {
+            elementStates.add(new ElementState(info, state));
             return this;
         }
 
