@@ -57,7 +57,7 @@ public class Scenario {
             return this;
         }
 
-        public Builder withInputText(ViewInfo viewInfo, String text) {
+        public Builder withInputText(ViewInfo viewInfo, String text, boolean pressImeOptions) {
             textToInput.add(new ElementInputText(viewInfo, text, false));
             return this;
         }
