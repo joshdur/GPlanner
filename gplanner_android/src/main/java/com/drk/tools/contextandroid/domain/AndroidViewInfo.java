@@ -109,13 +109,17 @@ public class AndroidViewInfo {
 
         private void addViewInfos(Collection<ViewInfo> viewInfos) {
             for (ViewInfo info : viewInfos) {
-                putElement(info, true);
-                if (info.hasClickDefined()) {
-                    addAction(info.clickAction);
-                }
-                if (info.hasImeOptionsClickDefined()) {
-                    addAction(info.imeOptionsClickAction);
-                }
+               addViewInfoAndActions(info, true);
+            }
+        }
+
+        private void addViewInfoAndActions(ViewInfo info, boolean isPresent){
+            putElement(info, isPresent);
+            if (info.hasClickDefined()) {
+                addAction(info.clickAction);
+            }
+            if (info.hasImeOptionsClickDefined()) {
+                addAction(info.imeOptionsClickAction);
             }
         }
 
@@ -125,7 +129,7 @@ public class AndroidViewInfo {
             }
             if (action.type == Action.Type.ADD_VIEWS) {
                 for (ViewInfo onDemandViewInfo : action.viewInfos) {
-                    putElement(onDemandViewInfo, false);
+                    addViewInfoAndActions(onDemandViewInfo, false);
                 }
             }
         }

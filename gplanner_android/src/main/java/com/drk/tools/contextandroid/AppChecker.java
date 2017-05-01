@@ -52,6 +52,9 @@ public class AppChecker {
     }
 
     private void runPaths(Context context, List<Plan> paths) throws Throwable {
+        if(paths.isEmpty()){
+            throw new IllegalStateException("There is no paths for defined scenario");
+        }
         for (Plan plan : paths) {
             context.execute(plan);
         }
