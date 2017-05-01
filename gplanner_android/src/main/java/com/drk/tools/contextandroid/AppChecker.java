@@ -14,6 +14,8 @@ import com.drk.tools.gplannercore.planner.PlanStream;
 import com.drk.tools.gplannercore.planner.Planner;
 import com.drk.tools.gplannercore.planner.search.forward.SimpleForward;
 import com.drk.tools.gplannercore.planner.search.graphplan.GraphPlan;
+import com.drk.tools.gplannercore.planner.search.hsp.HSP;
+import com.drk.tools.gplannercore.planner.search.hsp.heuristic.GraphPlanScore;
 import com.drk.tools.gplannercore.planner.state.GStateBuilder;
 import com.drk.tools.gplannercore.planner.state.debug.DebugStateBuilder;
 
@@ -130,6 +132,6 @@ public class AppChecker {
 
     private Searcher buildSearcher() {
        // return new SimpleForward(true);
-        return new GraphPlan(new SimpleForward(debug));
+        return new GraphPlan(new HSP(new GraphPlanScore()));
     }
 }
