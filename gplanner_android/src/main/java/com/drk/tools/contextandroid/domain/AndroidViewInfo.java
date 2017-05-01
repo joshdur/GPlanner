@@ -26,15 +26,15 @@ public class AndroidViewInfo {
         mapIntents = builder.mapIntents;
     }
 
-    public boolean isPresent(Element element){
-       return mapPresentElements.containsKey(element) && mapPresentElements.get(element);
+    public boolean isPresent(Element element) {
+        return mapPresentElements.containsKey(element) && mapPresentElements.get(element);
     }
 
-    public boolean isPresent(PagerElement pagerElement){
+    public boolean isPresent(PagerElement pagerElement) {
         return false;
     }
 
-    public void setAsPresent(ViewInfo viewInfo){
+    public void setAsPresent(ViewInfo viewInfo) {
         Element element = findElementWithViewInfo(viewInfo);
         mapPresentElements.put(element, true);
     }
@@ -42,7 +42,7 @@ public class AndroidViewInfo {
     public Element findElementWithViewInfo(ViewInfo otherViewInfo) {
         for (Map.Entry<Element, ViewInfo> entry : mapElements.entrySet()) {
             ViewInfo viewInfo = entry.getValue();
-            if(viewInfo.matches(otherViewInfo)){
+            if (viewInfo.matches(otherViewInfo)) {
                 return entry.getKey();
             }
         }
@@ -110,15 +110,22 @@ public class AndroidViewInfo {
         private void addViewInfos(Collection<ViewInfo> viewInfos) {
             for (ViewInfo info : viewInfos) {
                 putElement(info, true);
-                if(info.hasClickDefined()){
-                    if(info.action.type == Action.Type.INTENT) {
-                        mapIntents.put(Intent.values()[mapIntents.size()], info.action.intentData);
-                    }
-                    if(info.action.type == Action.Type.ADD_VIEWS){
-                        for(ViewInfo onDemandViewInfo : info.action.viewInfos){
-                            putElement(onDemandViewInfo, false);
-                        }
-                    }
+                if (info.hasClickDefined()) {
+                    addAction(info.clickAction);
+                }
+                if (info.hasImeOptionsClickDefined()) {
+                    addAction(info.imeOptionsClickAction);
+                }
+            }
+        }
+
+        private void addAction(Action action) {
+            if (action.type == Action.Type.INTENT) {
+                mapIntents.put(Intent.values()[mapIntents.size()], action.intentData);
+            }
+            if (action.type == Action.Type.ADD_VIEWS) {
+                for (ViewInfo onDemandViewInfo : action.viewInfos) {
+                    putElement(onDemandViewInfo, false);
                 }
             }
         }

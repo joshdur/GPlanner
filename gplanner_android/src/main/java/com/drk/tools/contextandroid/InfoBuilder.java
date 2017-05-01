@@ -60,7 +60,6 @@ class InfoBuilder {
     }
 
     BackInfo getBackInfo() {
-
         HashMap<Screen, Screen> backData = new LinkedHashMap<>();
         for (Map.Entry<Screen, ScreenInfo> entry : info.mapScreens.entrySet()) {
             ScreenInfo screenInfo = entry.getValue();
@@ -75,14 +74,18 @@ class InfoBuilder {
 
     ActionInfo getActionInfo() {
         HashMap<Element, Action> hashData = new LinkedHashMap<>();
+        HashMap<Element, Action> hashImeData = new LinkedHashMap<>();
         for (Map.Entry<Element, ViewInfo> entry : info.mapElements.entrySet()) {
             Element element = entry.getKey();
             ViewInfo viewInfo = entry.getValue();
             if (viewInfo.hasClickDefined()) {
-                hashData.put(element, viewInfo.action);
+                hashData.put(element, viewInfo.clickAction);
+            }
+            if(viewInfo.hasImeOptionsClickDefined()){
+                hashImeData.put(element, viewInfo.imeOptionsClickAction);
             }
         }
-        return new ActionInfo(hashData, info, debug);
+        return new ActionInfo(hashData, hashImeData, info, debug);
     }
 
     InitInfo getInitInfo() {

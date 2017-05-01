@@ -5,47 +5,53 @@ public class ViewInfo {
     public final int id;
     public final String text;
     public final String hint;
-    public final Action action;
+    public final Action clickAction;
+    public final Action imeOptionsClickAction;
     public final ViewInfo showsAfter;
 
     private ViewInfo(Builder builder) {
         this.id = builder.id;
         this.text = builder.text;
         this.hint = builder.hint;
-        this.action = builder.action;
+        this.clickAction = builder.action;
+        this.imeOptionsClickAction = builder.imeOptionsClickAction;
         this.showsAfter = builder.showsAfter;
     }
 
-    public boolean matches(ViewInfo viewInfo){
-        if(id != -1 && viewInfo.id != -1){
+    public boolean matches(ViewInfo viewInfo) {
+        if (id != -1 && viewInfo.id != -1) {
             return id == viewInfo.id;
         }
-        if(text != null && viewInfo.text != null){
+        if (text != null && viewInfo.text != null) {
             return text.equals(viewInfo.text);
         }
-        if(hint != null && viewInfo.hint != null){
+        if (hint != null && viewInfo.hint != null) {
             return hint.equals(viewInfo.hint);
         }
         return false;
     }
 
     public boolean hasClickDefined() {
-        return action != null;
+        return clickAction != null;
     }
 
-    public boolean dependsOnView(){
+    public boolean hasImeOptionsClickDefined() {
+        return imeOptionsClickAction != null;
+    }
+
+    public boolean dependsOnView() {
         return showsAfter != null;
     }
 
-    public boolean hasId(){
+    public boolean hasId() {
         return id != -1;
     }
 
-    public static ViewInfo of(int id){
+    public static ViewInfo of(int id) {
         return builder().id(id).build();
     }
 
-    public static ViewInfo of(int id, ViewInfo showsAfter){
+    public static ViewInfo of(int id, ViewInfo showsAfter) {
         return builder().id(id).showsAfter(showsAfter).build();
     }
 
@@ -64,9 +70,10 @@ public class ViewInfo {
         private String text;
         private String hint;
         private Action action;
+        private Action imeOptionsClickAction;
         private ViewInfo showsAfter;
 
-        public Builder id(int id){
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
@@ -86,7 +93,12 @@ public class ViewInfo {
             return this;
         }
 
-        public Builder showsAfter(ViewInfo viewInfo){
+        public Builder imeOptionsClickAction(Action action) {
+            this.imeOptionsClickAction = action;
+            return this;
+        }
+
+        public Builder showsAfter(ViewInfo viewInfo) {
             this.showsAfter = viewInfo;
             return this;
         }

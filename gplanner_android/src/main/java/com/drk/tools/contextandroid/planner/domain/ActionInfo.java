@@ -23,11 +23,13 @@ import static com.drk.tools.contextandroid.planner.atoms.MainAtoms.*;
 public class ActionInfo {
 
     private final HashMap<Element, Action> hashActionData;
+    private final HashMap<Element, Action> hashImeOptionsActionData;
     private final AndroidViewInfo info;
     private final boolean debug;
 
-    public ActionInfo(HashMap<Element, Action> hashActionData, AndroidViewInfo info, boolean debug) {
+    public ActionInfo(HashMap<Element, Action> hashActionData, HashMap<Element, Action> hashImeOptionsActionData, AndroidViewInfo info, boolean debug) {
         this.hashActionData = hashActionData;
+        this.hashImeOptionsActionData = hashImeOptionsActionData;
         this.info = info;
         this.debug = debug;
     }
@@ -36,17 +38,29 @@ public class ActionInfo {
         return hashActionData.containsKey(element);
     }
 
+    public boolean hasImeActionsDefined(Element element) {
+        return hashImeOptionsActionData.containsKey(element);
+    }
+
+    public void solveImeOptionsAction(Element element, StateTransition stateTransition) {
+        Action action = hashImeOptionsActionData.get(element);
+        resolve(action, stateTransition);
+    }
+
     public void solveAction(Element element, StateTransition stateTransition) {
         Action action = hashActionData.get(element);
-        if (action == null) {
-            return;
-        }
-        if (action.type == Action.Type.CHANGE_SCREEN) {
-            navigationTo(action.screenName, stateTransition);
-        } else if (action.type == Action.Type.INTENT) {
-            intentTo(action.intentData, stateTransition);
-        } else if (action.type == Action.Type.ADD_VIEWS) {
-            addViews(action.viewInfos);
+        resolve(action, stateTransition);
+    }
+
+    private void resolve(Action action, StateTransition stateTransition) {
+        if (action != null) {
+            if (action.type == Action.Type.CHANGE_SCREEN) {
+                navigationTo(action.screenName, stateTransition);
+            } else if (action.type == Action.Type.INTENT) {
+                intentTo(action.intentData, stateTransition);
+            } else if (action.type == Action.Type.ADD_VIEWS) {
+                addViews(action.viewInfos);
+            }
         }
     }
 
