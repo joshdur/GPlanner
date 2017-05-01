@@ -129,7 +129,7 @@ public class AppChecker {
     }
 
     private Searcher buildSearcher() {
-        //return new SimpleForward();
+       // return new SimpleForward(true);
         return new GraphPlan(new SimpleForward(debug));
     }
 }

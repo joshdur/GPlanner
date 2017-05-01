@@ -106,7 +106,7 @@ public class AndroidOperators extends Operators {
     public StateTransition checkVisibility(Element element) {
         StateTransition stateTransition = newTransition();
         AndroidViewInfo info = get(AndroidViewInfo.class);
-        if (info.isPresent(element)) {
+        if (info.isDefined(element)) {
             withAppLaunched(stateTransition);
             noPendings(stateTransition);
             checkAtScreen(stateTransition, element);
@@ -119,7 +119,7 @@ public class AndroidOperators extends Operators {
     public StateTransition checkElementState(Element element) {
         StateTransition stateTransition = newTransition();
         AndroidViewInfo info = get(AndroidViewInfo.class);
-        if (info.isPresent(element)) {
+        if (info.isDefined(element)) {
             withAppLaunched(stateTransition);
             noPendings(stateTransition);
             checkAtScreen(stateTransition, element);
@@ -132,7 +132,7 @@ public class AndroidOperators extends Operators {
     public StateTransition checkPagerVisibility(PagerElement pagerElement) {
         StateTransition stateTransition = newTransition();
         AndroidViewInfo info = get(AndroidViewInfo.class);
-        if (info.isPresent(pagerElement)) {
+        if (info.isDefined(pagerElement)) {
             withAppLaunched(stateTransition);
             noPendings(stateTransition);
             checkAtScreen(stateTransition, pagerElement);
@@ -157,12 +157,12 @@ public class AndroidOperators extends Operators {
         return stateTransition;
     }
 
+
     @Operator
     public StateTransition setElementText(Element element) {
         StateTransition stateTransition = newTransition();
         withAppLaunched(stateTransition);
         noPendings(stateTransition);
-
         checkAtScreen(stateTransition, element);
         TextInfo textInfo = get(TextInfo.class);
         ActionInfo actionInfo = get(ActionInfo.class);
@@ -234,6 +234,10 @@ public class AndroidOperators extends Operators {
     }
 
     private void checkAtScreen(StateTransition stateTransition, Element element) {
+        AndroidViewInfo info = get(AndroidViewInfo.class);
+        if(!info.isPresent(element)){
+            stateTransition.check(addedElement, element);
+        }
         HierarchyInfo hierarchyInfo = get(HierarchyInfo.class);
         if (hierarchyInfo.belongsToScreen(element)) {
             Screen screen = hierarchyInfo.screenOf(element);

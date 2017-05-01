@@ -31,7 +31,7 @@ public class TestPlanner {
 
     @Test
     public void testImeOptionsClicked() throws Throwable{
-        AppChecker planner = new AppChecker(ScreenDefinition.build(), new TestAndroidSystem());
+        AppChecker planner = new AppChecker(ScreenDefinition.build(), new TestAndroidSystem(), false);
         Scenario scenario = Scenario.builder()
                 .withMocked(MyMocks.TEST1)
                 .withCheckedScreen(ScreenDefinition.SCREEN_LIST_NEWS)

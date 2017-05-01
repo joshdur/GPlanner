@@ -26,11 +26,15 @@ public class AndroidViewInfo {
         mapIntents = builder.mapIntents;
     }
 
-    public boolean isPresent(Element element) {
+    public boolean isDefined(Element element) {
+        return mapElements.containsKey(element) && mapElements.get(element) != null;
+    }
+
+    public boolean isPresent(Element element){
         return mapPresentElements.containsKey(element) && mapPresentElements.get(element);
     }
 
-    public boolean isPresent(PagerElement pagerElement) {
+    public boolean isDefined(PagerElement pagerElement) {
         return false;
     }
 

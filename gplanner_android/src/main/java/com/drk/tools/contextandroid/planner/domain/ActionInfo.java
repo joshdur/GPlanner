@@ -59,14 +59,14 @@ public class ActionInfo {
             } else if (action.type == Action.Type.INTENT) {
                 intentTo(action.intentData, stateTransition);
             } else if (action.type == Action.Type.ADD_VIEWS) {
-                addViews(action.viewInfos);
+                addViews(action.viewInfos, stateTransition);
             }
         }
     }
 
-    private void addViews(Set<ViewInfo> views) {
+    private void addViews(Set<ViewInfo> views, StateTransition stateTransition) {
         for (ViewInfo viewInfo : views) {
-            info.setAsPresent(viewInfo);
+            stateTransition.set(buildStatement(addedElement, info.findElementWithViewInfo(viewInfo)));
         }
     }
 

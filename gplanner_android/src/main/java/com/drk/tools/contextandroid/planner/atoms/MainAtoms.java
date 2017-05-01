@@ -4,7 +4,7 @@ import com.drk.tools.contextandroid.planner.variables.*;
 import com.drk.tools.gplannercore.core.Atom;
 
 public class MainAtoms {
-
+    public static AddedElement addedElement = new AddedElement();
     public static MockPending mockPending = new MockPending();
     public static LaunchPending launchPending = new LaunchPending();
     public static ScreenNavigationPending screenNavigationPending = new ScreenNavigationPending();
@@ -23,6 +23,10 @@ public class MainAtoms {
     public static ElementClicked elementClicked = new ElementClicked();
     public static ElementTextSet elementTextSet = new ElementTextSet();
     public static BackAt backAt = new BackAt();
+
+    public static class AddedElement extends Atom<Element> {
+
+    }
 
     public static class MockPending extends Atom<Bool> {
 
