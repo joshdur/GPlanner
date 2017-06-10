@@ -6,7 +6,7 @@ import com.drk.tools.gplannercore.core.search.Searcher;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.streams.GOutputStream;
 import com.drk.tools.gplannercore.core.streams.PlanBuffer;
-import com.drk.tools.gplannercore.planner.search.context.SearchContext;
+import com.drk.tools.gplannercore.core.search.context.SearchContext;
 
 public class Planner {
 

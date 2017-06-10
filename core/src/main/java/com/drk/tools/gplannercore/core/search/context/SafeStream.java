@@ -1,4 +1,4 @@
-package com.drk.tools.gplannercore.planner.search.context;
+package com.drk.tools.gplannercore.core.search.context;
 
 import com.drk.tools.gplannercore.core.Plan;
 import com.drk.tools.gplannercore.core.search.SearchException;

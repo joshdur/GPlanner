@@ -5,8 +5,8 @@ import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.search.Searcher;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Transition;
-import com.drk.tools.gplannercore.planner.search.context.SearchContext;
-import com.drk.tools.gplannercore.planner.search.context.SearchNode;
+import com.drk.tools.gplannercore.core.search.context.SearchContext;
+import com.drk.tools.gplannercore.core.search.context.SearchNode;
 import com.drk.tools.gplannercore.planner.search.hsp.heuristic.Score;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 
