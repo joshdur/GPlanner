@@ -1,9 +1,9 @@
 package com.drk.tools.gplannercore.planner.state;
 
 import com.drk.tools.gplannercore.core.Atom;
-import com.drk.tools.gplannercore.core.state.StateBuilder;
+import com.drk.tools.gplannercore.core.variables.Variable;
 
-public class GStateBuilder implements StateBuilder {
+public class GStateBuilder {
 
     private final GState state;
 
@@ -11,7 +11,7 @@ public class GStateBuilder implements StateBuilder {
         this.state = new GState();
     }
 
-    public <E extends Enum> GStateBuilder set(Atom<E> a, E v) {
+    public <V extends Variable> GStateBuilder set(Atom<V> a, V v) {
         state.set(GStatement.from(a, v));
         return this;
     }

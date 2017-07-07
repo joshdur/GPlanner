@@ -1,24 +1,15 @@
 package com.drk.tools.gplannercore;
 
 import com.drk.tools.gplannercore.annotations.Operator;
+import com.drk.tools.gplannercore.annotations.variables.EnumRange;
 import com.drk.tools.gplannercore.core.Atom;
 import com.drk.tools.gplannercore.core.main.Operators;
 import com.drk.tools.gplannercore.core.state.StateTransition;
+import com.drk.tools.gplannercore.core.variables.enumvars.EnumVariable;
 import com.drk.tools.gplannercore.planner.state.GStateTransition;
 
 public class Monkey extends Operators {
 
-    public enum Location {
-        A, B, C, D, E
-    }
-
-    public enum Thing {
-        NOTHING, BANANAS
-    }
-
-    public enum LevelState {
-        HIGH, LOW
-    }
 
     public static At at = new At();
     public static BoxAt boxAt = new BoxAt();
@@ -82,4 +73,43 @@ public class Monkey extends Operators {
 
     public static class Level extends Atom<LevelState> {
     }
+
+    @EnumRange(enumClass = Monkey.Location.Loc.class)
+    public static class Location extends EnumVariable {
+
+        public Location(Enum value) {
+            super(value);
+        }
+
+        public enum Loc {
+            A, B, C, D, E
+        }
+    }
+
+    @EnumRange(enumClass = Thing.ThingEnum.class)
+    public static class Thing extends EnumVariable {
+
+        public Thing(Enum value) {
+            super(value);
+        }
+
+        public enum ThingEnum {
+            NOTHING, BANANAS
+        }
+    }
+
+
+    @EnumRange(enumClass = LevelState.LevelStateEnum.class)
+    public static class LevelState extends EnumVariable {
+
+        public LevelState(Enum value) {
+            super(value);
+        }
+
+        public enum LevelStateEnum {
+            HIGH, LOW
+        }
+    }
+
+
 }

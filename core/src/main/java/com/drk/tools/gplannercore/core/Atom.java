@@ -1,4 +1,6 @@
 package com.drk.tools.gplannercore.core;
 
-public class Atom<E extends Enum> {
+import com.drk.tools.gplannercore.core.variables.Variable;
+
+public class Atom<E extends Variable> {
 }

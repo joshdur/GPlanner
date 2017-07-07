@@ -2,6 +2,7 @@ package com.drk.tools.gplannercore.planner.state;
 
 import com.drk.tools.gplannercore.core.Atom;
 import com.drk.tools.gplannercore.core.state.Statement;
+import com.drk.tools.gplannercore.core.variables.Variable;
 
 public class GStatement implements Statement {
 
@@ -11,7 +12,7 @@ public class GStatement implements Statement {
         this.hashCode = hashCode;
     }
 
-    public static GStatement from(Atom atom, Enum variable){
+    public static <V extends Variable> GStatement from(Atom<V> atom, V variable) {
         int hashCode = 31 * atom.getClass().hashCode() + variable.hashCode();
         return new GStatement(hashCode);
     }

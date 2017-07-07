@@ -2,20 +2,21 @@ package com.drk.tools.gplannercore.planner.state.debug;
 
 import com.drk.tools.gplannercore.core.Atom;
 import com.drk.tools.gplannercore.core.state.Statement;
+import com.drk.tools.gplannercore.core.variables.Variable;
 
 public class DebugStatement implements Statement {
 
     private final Atom atom;
-    private final Enum variable;
+    private final Variable variable;
     private final int hashCode;
 
-    private DebugStatement(Atom atom, Enum variable, int hashCode) {
+    private DebugStatement(Atom atom, Variable variable, int hashCode) {
         this.atom = atom;
         this.variable = variable;
         this.hashCode = hashCode;
     }
 
-    public static DebugStatement from(Atom atom, Enum variable) {
+    public static <V extends Variable> DebugStatement from(Atom<V> atom, V variable) {
         int hashCode = 31 * atom.getClass().hashCode() + variable.hashCode();
         return new DebugStatement(atom, variable, hashCode);
     }
@@ -32,6 +33,6 @@ public class DebugStatement implements Statement {
 
     @Override
     public String toString() {
-        return atom.getClass().getSimpleName() + " [" + variable.name() + "] ";
+        return atom.getClass().getSimpleName() + " [" + variable.toString() + "] ";
     }
 }

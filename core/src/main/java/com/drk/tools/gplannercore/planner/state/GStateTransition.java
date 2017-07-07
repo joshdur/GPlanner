@@ -3,6 +3,7 @@ package com.drk.tools.gplannercore.planner.state;
 import com.drk.tools.gplannercore.core.Atom;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
+import com.drk.tools.gplannercore.core.variables.Variable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public class GStateTransition implements StateTransition {
         return (7 * hashCode1) + (17 * hashCode2) + (31 * hashCode3) + (43 * hashCode4);
     }
 
-    public <E extends Enum> GStateTransition check(Atom<E> a, E v) {
+    public <V extends Variable> GStateTransition check(Atom<V> a, V v) {
         return check(GStatement.from(a, v));
     }
 
@@ -63,7 +64,7 @@ public class GStateTransition implements StateTransition {
         return this;
     }
 
-    public <E extends Enum> GStateTransition set(Atom<E> a, E v) {
+    public <V extends Variable> GStateTransition set(Atom<V> a, V v) {
         return set(GStatement.from(a, v));
     }
 
@@ -77,7 +78,7 @@ public class GStateTransition implements StateTransition {
         return this;
     }
 
-    public <E extends Enum> GStateTransition not(Atom<E> a, E v) {
+    public <V extends Variable> GStateTransition not(Atom<V> a, V v) {
         return not(GStatement.from(a, v));
     }
 
