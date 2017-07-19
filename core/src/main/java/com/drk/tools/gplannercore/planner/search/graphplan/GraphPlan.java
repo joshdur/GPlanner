@@ -68,13 +68,13 @@ public class GraphPlan implements Searcher {
         statements.addAll(layer.statements);
         Set<Rel> statementExclusions = Mutex.mutexStatements(statements, layer);
         Set<Transition> transitions = getApplicableTransitions(statementExclusions, context, statements);
-        transitions.add(noopTransition(layer.statements));
+        transitions.add(noopTransition(context, layer.statements));
         Set<Rel> transitionExclusions = Mutex.mutexTransitions(transitions, statementExclusions);
         return new Layer(layer, statementExclusions, statements, transitions, transitionExclusions);
     }
 
-    private Transition noopTransition(Set<Statement> statements) {
-        StateTransition stateTransition = new GStateTransition();
+    private Transition noopTransition(Context context, Set<Statement> statements) {
+        StateTransition stateTransition = new GStateTransition(context);
         stateTransition.setAll(statements);
         return Transition.noop(stateTransition);
     }
