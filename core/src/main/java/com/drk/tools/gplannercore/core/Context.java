@@ -2,15 +2,23 @@ package com.drk.tools.gplannercore.core;
 
 import com.drk.tools.gplannercore.core.main.BaseUnifier;
 import com.drk.tools.gplannercore.core.state.Transition;
+import com.drk.tools.gplannercore.core.variables.Variable;
+import com.drk.tools.gplannercore.core.variables.VariableRange;
 
 import java.util.List;
 
 public abstract class Context {
 
-    protected final Bundle bundle;
+    private final Mapper operatorMapper;
+    private final Mapper variableMapper;
+    private final Mapper mapper;
+    private final boolean isDebug;
 
-    public Context(Bundle bundle) {
-        this.bundle = bundle;
+    public Context(boolean isDebug) {
+        this.operatorMapper = new Mapper();
+        this.variableMapper = new Mapper();
+        this.mapper = new Mapper();
+        this.isDebug = isDebug;
     }
 
     public abstract List<BaseUnifier> getUnifiers();
@@ -49,6 +57,40 @@ public abstract class Context {
     public Transition execute(Transition transition) throws Throwable {
         BaseUnifier unifier = findUnifier(transition);
         return unifier.execute(transition);
+    }
+
+    protected void addOperatorToInject(Object object) {
+        operatorMapper.set(object.getClass(), object);
+    }
+
+    protected void addVariable(Class variable, Object range){
+        variableMapper.set(variable, range);
+    }
+
+    public void addToInject(Object object) {
+        mapper.set(object.getClass(), object);
+    }
+
+    public <T> T inject(Class<T> tClass) {
+        return mapper.get(tClass);
+    }
+
+    public <T> T injectOperator(Class<T> tClass) {
+        return operatorMapper.get(tClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Variable> VariableRange<T> injectRangeFromVariableClass(Class<T> variable){
+        return (VariableRange<T>) variableMapper.get(variable);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Variable> VariableRange<T> injectRangeFromVariableClass(T variable){
+        return (VariableRange<T>) variableMapper.get(variable.getClass());
+    }
+
+    public boolean isDebug() {
+        return isDebug;
     }
 
 }

@@ -9,9 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface Unifier {
 
-    String from() default "";
-
-    String hash() default "";
+    String[] operatorClasses();
 
     String operator();
 
