@@ -17,8 +17,8 @@ public abstract class EnumVariableRange<T extends EnumVariable> implements Varia
 
     @Override
     public T variableAt(int position) {
-        return valueOf(values[position]);
+        return variableOf(values[position]);
     }
 
-    protected abstract T valueOf(Enum enumVar);
+    protected abstract T variableOf(Enum enumVar);
 }

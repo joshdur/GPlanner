@@ -13,12 +13,14 @@ import java.util.*;
 public class ContextGenerator {
 
     private final Set<? extends Element> unifiers;
+    private final Set<? extends Element> collections;
     private final Types types;
     private final Logger logger;
     private final ContextChecker contextChecker;
 
-    public ContextGenerator(Set<? extends Element> unifiers, Types types, Logger logger) {
+    public ContextGenerator(Set<? extends Element> unifiers, Set<? extends Element> collections, Types types, Logger logger) {
         this.unifiers = unifiers;
+        this.collections = collections;
         this.types = types;
         this.logger = logger;
         this.contextChecker = new ContextChecker(logger, types);
@@ -27,6 +29,7 @@ public class ContextGenerator {
     public void generate(CompilerFiler filer) throws GenException {
         logger.log(this, "Generate domains...");
         contextChecker.check(unifiers);
+        contextChecker.checkCollections(collections);
         logger.log(this, "Building Specs");
         List<SpecContext> specs = buildSpecs();
         logger.log(this, "Start generating domains");
@@ -55,7 +58,7 @@ public class ContextGenerator {
         }
         List<TypeContext> typeContexts = new ArrayList<>();
         for (Map.Entry<String, Set<TypeElement>> entry : hashUnifiers.entrySet()) {
-            TypeContext typeContext = new TypeContext(entry.getKey(), entry.getValue(), types);
+            TypeContext typeContext = new TypeContext(entry.getKey(), entry.getValue(), collections, types);
             typeContexts.add(typeContext);
         }
         return typeContexts;

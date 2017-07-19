@@ -5,13 +5,12 @@ import com.drk.tools.gplannercompiler.gen.GenException;
 import com.drk.tools.gplannercore.core.Bundle;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.main.BaseUnifier;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +36,7 @@ class SpecContext {
         TypeSpec.Builder builder = TypeSpec.classBuilder(String.format(DOMAIN_NAME, typeContext.getClassName()));
         builder.superclass(Context.class);
         builder.addModifiers(Modifier.PUBLIC);
+        addCollectionFields(builder, typeContext.getCollectionElements());
         addFields(builder, typeContext.getOperatorsTypes());
         addFields(builder, typeContext.getSystemActionTypes());
         builder.addMethod(getConstructor());
@@ -49,6 +49,17 @@ class SpecContext {
         logger.log(this, "- Adding Fields");
         for (TypeAndName type : types) {
             builder.addField(type.typeName, type.name, Modifier.PRIVATE, Modifier.FINAL);
+        }
+    }
+
+    private void addCollectionFields(TypeSpec.Builder builder, Collection<TypeContext.CollectionElement> elements) {
+        logger.log(this, "- Adding CollectionFields");
+        for (TypeContext.CollectionElement element : elements) {
+            FieldSpec fieldSpec = FieldSpec.builder(element.typeName, element.name, Modifier.PUBLIC, Modifier.FINAL)
+                    .initializer("new $T()", element.typeName)
+                    .build();
+
+            builder.addField(fieldSpec);
         }
     }
 

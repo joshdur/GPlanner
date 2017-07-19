@@ -3,12 +3,11 @@ package com.drk.tools.gplannercompiler.gen.unifier;
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercore.annotations.core.Unifier;
 import com.drk.tools.gplannercore.core.main.BaseUnifier;
-import com.drk.tools.gplannercore.core.main.Operators;
-import com.drk.tools.gplannercore.core.main.SystemActions;
 import com.drk.tools.gplannercore.core.state.StateTransition;
+import com.drk.tools.gplannercore.core.variables.Variable;
+import com.drk.tools.gplannercore.core.variables.VariableRange;
 import com.drk.tools.gplannercore.planner.state.GStateTransition;
 import com.squareup.javapoet.*;
-import com.sun.org.apache.bcel.internal.classfile.Code;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ class SpecUnifier {
         if (typeUnifier.existsSystemAction()) {
             builder.addParameter(typeUnifier.getSystemActionsType(), "systemActions");
         }
-        builder.addStatement("super($S, getVariables())", typeUnifier.getOperatorName());
+        builder.addStatement("super($S)", typeUnifier.getOperatorName());
         builder.addStatement("this.operators = operators");
         if (typeUnifier.existsSystemAction()) {
             builder.addStatement("this.systemActions = systemActions");
@@ -76,14 +75,15 @@ class SpecUnifier {
     private MethodSpec getVariables() {
         logger.log(this, "- getVariables method");
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getVariables");
-        builder.addModifiers(Modifier.PRIVATE, Modifier.STATIC);
-        builder.returns(Enum[][].class);
-        List<TypeName> variables = typeUnifier.getVariables();
-        builder.addStatement("$1T<$2T> enums = new $3T<$2T>()", List.class, Enum[].class, ArrayList.class);
-        for (TypeName variable : variables) {
-            builder.addStatement("enums.add($T.values())", variable);
+        builder.addAnnotation(Override.class);
+        builder.addModifiers(Modifier.PROTECTED);
+        builder.returns(ParameterizedTypeName.get(List.class, VariableRange.class));
+        List<String> ranges = typeUnifier.getRanges();
+        builder.addStatement("$1T<$2T> variableRanges = new $3T<$2T>()", List.class, VariableRange.class, ArrayList.class);
+        for (String variableRange : ranges) {
+            builder.addStatement("variableRanges.add(new $L())", variableRange);
         }
-        builder.addStatement("return enums.toArray(new Enum[][]{})");
+        builder.addStatement("return variableRanges");
         return builder.build();
     }
 
@@ -93,7 +93,7 @@ class SpecUnifier {
         builder.addAnnotation(Override.class);
         builder.returns(StateTransition.class);
         builder.addModifiers(Modifier.PROTECTED);
-        builder.addParameter(ParameterizedTypeName.get(List.class, String.class), "variables");
+        builder.addParameter(ParameterizedTypeName.get(List.class, Variable.class), "variables");
         recoverAndCallMethodWithVariables(builder, "operators");
         return builder.build();
     }
@@ -103,12 +103,12 @@ class SpecUnifier {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("execute");
         builder.addAnnotation(Override.class);
         builder.addModifiers(Modifier.PROTECTED);
-        builder.addParameter(ParameterizedTypeName.get(List.class, String.class), "variables");
+        builder.addParameter(ParameterizedTypeName.get(List.class, Variable.class), "variables");
         builder.returns(StateTransition.class);
         builder.addException(Throwable.class);
-        if(typeUnifier.existsSystemAction()) {
+        if (typeUnifier.existsSystemAction()) {
             recoverAndCallMethodWithVariables(builder, "systemActions");
-        }  else {
+        } else {
             builder.addStatement("return new $T()", GStateTransition.class);
         }
         return builder.build();
@@ -118,7 +118,7 @@ class SpecUnifier {
         List<TypeName> variables = typeUnifier.getVariables();
         for (int i = 0; i < variables.size(); i++) {
             TypeName variable = variables.get(i);
-            builder.addStatement("$1T $2L$3L = $1T.valueOf(variables.get($3L))", variable, VARIABLE_NAME, i);
+            builder.addStatement("$1T $2L$3L = ($1T) variables.get($3L)", variable, VARIABLE_NAME, i);
         }
         String commaSeparatedVariables = getCommaSeparated(VARIABLE_NAME, variables.size());
         builder.addStatement("return $L.$L($L)", instance, typeUnifier.getOperatorName(), commaSeparatedVariables);

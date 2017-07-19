@@ -1,6 +1,7 @@
 package com.drk.tools.gplannercompiler.gen.context;
 
 import com.drk.tools.gplannercompiler.gen.GenException;
+import com.drk.tools.gplannercompiler.gen.variables.support.Extractor;
 import com.drk.tools.gplannercore.core.main.Operators;
 import com.drk.tools.gplannercore.core.main.SystemActions;
 import com.squareup.javapoet.TypeName;
@@ -12,23 +13,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.drk.tools.gplannercompiler.gen.variables.support.Extractor.getVariableName;
+
 class TypeContext {
 
     private final String name;
     private final List<TypeElement> unifiers;
+    private final Set<? extends Element> collections;
     private final Types types;
 
-    TypeContext(String name, Set<TypeElement> unifiers, Types types) {
+    TypeContext(String name, Set<TypeElement> unifiers, Set<? extends Element> collections, Types types) {
         this.name = name;
         this.unifiers = new ArrayList<>(unifiers);
+        this.collections = collections;
         this.types = types;
 
     }
 
     String getPackage() {
-        TypeElement typeElement = unifiers.get(0);
-        String qualifiedName = typeElement.getQualifiedName().toString();
-        return qualifiedName.substring(0, qualifiedName.lastIndexOf("."));
+        return Extractor.getPackage(unifiers.get(0));
     }
 
     String getClassName() {
@@ -73,13 +76,14 @@ class TypeContext {
         return datas;
     }
 
-    private String getVariableName(TypeElement typeElement) {
-        if (typeElement == null) {
-            return null;
+    List<CollectionElement> getCollectionElements() {
+        List<CollectionElement> collectionElements = new ArrayList<>();
+        for (Element element : collections) {
+            collectionElements.add(new CollectionElement(TypeName.get(element.asType()), getVariableName(element)));
         }
-        String name = typeElement.getSimpleName().toString();
-        return name.substring(0, 1).toLowerCase() + name.substring(1);
+        return collectionElements;
     }
+
 
     private <T> TypeElement getVariable(TypeElement typeElement, Class<T> parent) {
         List<? extends Element> elements = typeElement.getEnclosedElements();
@@ -96,5 +100,15 @@ class TypeContext {
             }
         }
         return null;
+    }
+
+    public static class CollectionElement {
+        public final TypeName typeName;
+        public final String name;
+
+        public CollectionElement(TypeName typeName, String name) {
+            this.typeName = typeName;
+            this.name = name;
+        }
     }
 }

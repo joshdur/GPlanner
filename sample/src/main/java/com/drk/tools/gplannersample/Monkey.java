@@ -5,20 +5,9 @@ import com.drk.tools.gplannercore.core.Atom;
 import com.drk.tools.gplannercore.core.main.Operators;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.planner.state.GStateTransition;
+import com.drk.tools.gplannersample.vars.*;
 
 public class Monkey extends Operators {
-
-    public enum Location {
-        A, B, C, D, E
-    }
-
-    public enum Thing {
-        NOTHING, BANANAS
-    }
-
-    public enum LevelState {
-        HIGH, LOW
-    }
 
     public static At at = new At();
     public static BoxAt boxAt = new BoxAt();
@@ -30,23 +19,23 @@ public class Monkey extends Operators {
     @Operator
     StateTransition climbDown(Location x) {
         return new GStateTransition()
-                .check(at, x).check(boxAt, x).check(level, LevelState.HIGH)
-                .not(level, LevelState.LOW)
-                .set(level, LevelState.HIGH);
+                .check(at, x).check(boxAt, x).check(level, LevelStateRange.HIGH)
+                .not(level, LevelStateRange.LOW)
+                .set(level, LevelStateRange.HIGH);
     }
 
     @Operator
     StateTransition climbUp(Location x) {
         return new GStateTransition()
-                .check(at, x).check(boxAt, x).check(level, LevelState.LOW)
-                .not(level, LevelState.LOW)
-                .set(level, LevelState.HIGH);
+                .check(at, x).check(boxAt, x).check(level, LevelStateRange.LOW)
+                .not(level, LevelStateRange.LOW)
+                .set(level, LevelStateRange.HIGH);
     }
 
     @Operator
     StateTransition moveBox(Location x, Location y) {
         return new GStateTransition()
-                .check(at, x).check(boxAt, x).check(level, LevelState.LOW)
+                .check(at, x).check(boxAt, x).check(level, LevelStateRange.LOW)
                 .not(at, x).not(boxAt, x)
                 .set(at, y).set(boxAt, y);
     }
@@ -54,7 +43,7 @@ public class Monkey extends Operators {
     @Operator
     StateTransition move(Location x, Location y) {
         return new GStateTransition()
-                .check(at, x).check(level, LevelState.LOW)
+                .check(at, x).check(level, LevelStateRange.LOW)
                 .not(at, x)
                 .set(at, y);
     }
@@ -62,9 +51,9 @@ public class Monkey extends Operators {
     @Operator
     StateTransition takeBananas(Location x) {
         return new GStateTransition()
-                .check(at, x).check(bananasAt, x).check(level, LevelState.HIGH)
-                .not(have, Thing.NOTHING)
-                .set(have, Thing.BANANAS);
+                .check(at, x).check(bananasAt, x).check(level, LevelStateRange.HIGH)
+                .not(have, ThingRange.NOTHING)
+                .set(have, ThingRange.BANANAS);
     }
 
 

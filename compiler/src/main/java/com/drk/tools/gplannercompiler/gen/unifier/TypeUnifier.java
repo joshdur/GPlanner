@@ -1,5 +1,6 @@
 package com.drk.tools.gplannercompiler.gen.unifier;
 
+import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercore.core.main.SystemActions;
 import com.squareup.javapoet.TypeName;
 
@@ -7,6 +8,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 class TypeUnifier {
@@ -15,12 +17,14 @@ class TypeUnifier {
     private final ExecutableElement operator;
     private final ExecutableElement systemAction;
     private final List<? extends VariableElement> variables;
+    private final HashMap<String, String> ranges;
 
-    TypeUnifier(String name, ExecutableElement operator, ExecutableElement systemAction, List<? extends VariableElement> operatorVariables) {
+    TypeUnifier(String name, ExecutableElement operator, ExecutableElement systemAction, List<? extends VariableElement> operatorVariables, HashMap<String, String> ranges) {
         this.name = name;
         this.operator = operator;
         this.systemAction = systemAction;
         this.variables = operatorVariables;
+        this.ranges = ranges;
     }
 
     String getPackageName() {
@@ -36,8 +40,17 @@ class TypeUnifier {
 
     List<TypeName> getVariables() {
         List<TypeName> typeNames = new ArrayList<>();
-        for(VariableElement variable : variables){
+        for (VariableElement variable : variables) {
             typeNames.add(TypeName.get(variable.asType()));
+        }
+        return typeNames;
+    }
+
+    List<String> getRanges() {
+        List<String> typeNames = new ArrayList<>();
+        for (VariableElement variable : variables) {
+            String canonicalNameRange = ranges.get(variable.asType().toString());
+            typeNames.add(canonicalNameRange);
         }
         return typeNames;
     }
@@ -66,7 +79,7 @@ class TypeUnifier {
     }
 
     TypeName getSystemActionsType() {
-        if(existsSystemAction()) {
+        if (existsSystemAction()) {
             TypeElement typeElement = getTypeElement(systemAction);
             return TypeName.get(typeElement.asType());
         } else {
