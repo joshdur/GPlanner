@@ -1,5 +1,6 @@
 package com.drk.tools.gplannercore.core.main;
 
+import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.variables.Variable;
@@ -10,13 +11,15 @@ import java.util.List;
 
 public abstract class BaseUnifier {
 
+    private final Context context;
     private final String operatorName;
     private final List<VariableRange> variableRanges;
     private final Integer[] counts;
     private final int code;
     private final StateCounter stateCounter;
 
-    public BaseUnifier(String operatorName) {
+    public BaseUnifier(Context context, String operatorName) {
+        this.context = context;
         this.operatorName = operatorName;
         this.variableRanges = getVariables();
         this.counts = getCounts();
@@ -24,11 +27,15 @@ public abstract class BaseUnifier {
         this.stateCounter = new StateCounter(counts);
     }
 
+    protected <T> T operatorClass(Class<T> tClass) {
+        return context.injectOperator(tClass);
+    }
+
     protected abstract List<VariableRange> getVariables();
 
-    private Integer[] getCounts(){
+    private Integer[] getCounts() {
         List<Integer> counts = new ArrayList<>();
-        for(VariableRange variableRange : variableRanges){
+        for (VariableRange variableRange : variableRanges) {
             counts.add(variableRange.count());
         }
         return counts.toArray(new Integer[]{});
@@ -64,7 +71,7 @@ public abstract class BaseUnifier {
         return variables;
     }
 
-    private Variable variableAt(int index, int variablePosition){
+    private Variable variableAt(int index, int variablePosition) {
         return variableRanges.get(index).variableAt(variablePosition);
     }
 

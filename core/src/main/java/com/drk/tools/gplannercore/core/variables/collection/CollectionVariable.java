@@ -8,17 +8,4 @@ public abstract class CollectionVariable<T> extends Variable<T> {
         super(value);
     }
 
-    protected abstract int toHashCode(T value);
-
-    protected abstract String getStringName(T value);
-
-    @Override
-    public int hashCode() {
-        return toHashCode(value);
-    }
-
-    @Override
-    public String toString() {
-        return getStringName(value);
-    }
 }

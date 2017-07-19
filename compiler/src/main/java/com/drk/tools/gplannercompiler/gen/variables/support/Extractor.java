@@ -32,4 +32,16 @@ public class Extractor {
         String name = element.getSimpleName().toString();
         return name.substring(0, 1).toLowerCase() + name.substring(1);
     }
+
+    public static String getMethodName(String... parts) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (i == 0) {
+                stringBuilder.append(parts[i].toLowerCase());
+            } else {
+                stringBuilder.append(parts[i].substring(0, 1).toUpperCase()).append(parts[i].substring(1).toLowerCase());
+            }
+        }
+        return stringBuilder.toString();
+    }
 }

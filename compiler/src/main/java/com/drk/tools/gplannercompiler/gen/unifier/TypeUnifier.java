@@ -1,15 +1,11 @@
 package com.drk.tools.gplannercompiler.gen.unifier;
 
-import com.drk.tools.gplannercompiler.Logger;
-import com.drk.tools.gplannercore.core.main.SystemActions;
 import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 class TypeUnifier {
 
@@ -55,8 +51,16 @@ class TypeUnifier {
         return typeNames;
     }
 
-    String getHash() {
-        return "";
+    String getCommaSeparatedOperatorClasses() {
+        Set<String> operatorClasses = new HashSet<>();
+        operatorClasses.add(getTypeElement(operator).asType().toString());
+        if (systemAction != null) {
+            operatorClasses.add(getTypeElement(systemAction).asType().toString());
+        }
+        if(operatorClasses.isEmpty()){
+            return "{}";
+        }
+        return operatorClasses.toString().replace("[", "{\"").replace(",", "\", \"").replace("]", "\"}");
     }
 
     String getOperatorName() {
@@ -72,19 +76,6 @@ class TypeUnifier {
         TypeElement typeElement = getTypeElement(operator);
         return TypeName.get(typeElement.asType());
 
-    }
-
-    boolean existsSystemAction() {
-        return systemAction != null;
-    }
-
-    TypeName getSystemActionsType() {
-        if (existsSystemAction()) {
-            TypeElement typeElement = getTypeElement(systemAction);
-            return TypeName.get(typeElement.asType());
-        } else {
-            return TypeName.get(SystemActions.class);
-        }
     }
 
     private TypeElement getTypeElement(ExecutableElement element) {

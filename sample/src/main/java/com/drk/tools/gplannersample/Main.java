@@ -20,7 +20,7 @@ public class Main {
 
     public static void main(String[] args) throws Throwable {
         Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
-        MonkeyContext monkeyContext = new MonkeyContext();
+        DefaultContext monkeyContext = new DefaultContext();
         PlanStream planStream = planner.search(monkeyContext, initialState(), finalState());
         List<Plan> plans = planStream.read();
         while (!plans.isEmpty()) {
@@ -30,11 +30,11 @@ public class Main {
 
     }
 
-    private static void printPlans(List<Plan> plans, MonkeyContext context) throws Throwable {
+    private static void printPlans(List<Plan> plans, DefaultContext context) throws Throwable {
         for (Plan plan : plans) {
             String planStr = context.asString(plan);
             System.out.println(planStr);
-            //context.execute(plan);
+            context.execute(plan);
         }
     }
 

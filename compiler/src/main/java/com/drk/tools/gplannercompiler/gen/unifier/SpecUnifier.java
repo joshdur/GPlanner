@@ -2,11 +2,12 @@ package com.drk.tools.gplannercompiler.gen.unifier;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercore.annotations.core.Unifier;
+import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.main.BaseUnifier;
+import com.drk.tools.gplannercore.core.main.EmptyTransition;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.variables.Variable;
 import com.drk.tools.gplannercore.core.variables.VariableRange;
-import com.drk.tools.gplannercore.planner.state.GStateTransition;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
@@ -36,8 +37,6 @@ class SpecUnifier {
                 .superclass(BaseUnifier.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(getUnifierAnnotation())
-                .addField(typeUnifier.getOperatorsType(), "operators", Modifier.PRIVATE, Modifier.FINAL)
-                .addField(typeUnifier.getSystemActionsType(), "systemActions", Modifier.PRIVATE, Modifier.FINAL)
                 .addMethod(getVariables())
                 .addMethod(getConstructor())
                 .addMethod(getBuild())
@@ -48,8 +47,7 @@ class SpecUnifier {
     private AnnotationSpec getUnifierAnnotation() {
         logger.log(this, "- Annotation Unifier");
         return AnnotationSpec.builder(Unifier.class)
-                .addMember("from", "$S", typeUnifier.getDomainName())
-                .addMember("hash", "$S", typeUnifier.getHash())
+                .addMember("operatorClasses", "$L", typeUnifier.getCommaSeparatedOperatorClasses())
                 .addMember("operator", "$S", typeUnifier.getOperatorName())
                 .build();
     }
@@ -58,17 +56,8 @@ class SpecUnifier {
         logger.log(this, "- Constructor method");
         MethodSpec.Builder builder = MethodSpec.constructorBuilder();
         builder.addModifiers(Modifier.PUBLIC);
-        builder.addParameter(typeUnifier.getOperatorsType(), "operators");
-        if (typeUnifier.existsSystemAction()) {
-            builder.addParameter(typeUnifier.getSystemActionsType(), "systemActions");
-        }
-        builder.addStatement("super($S)", typeUnifier.getOperatorName());
-        builder.addStatement("this.operators = operators");
-        if (typeUnifier.existsSystemAction()) {
-            builder.addStatement("this.systemActions = systemActions");
-        } else {
-            builder.addStatement("this.systemActions = null");
-        }
+        builder.addParameter(Context.class, "context");
+        builder.addStatement("super(context, $S)", typeUnifier.getOperatorName());
         return builder.build();
     }
 
@@ -94,7 +83,8 @@ class SpecUnifier {
         builder.returns(StateTransition.class);
         builder.addModifiers(Modifier.PROTECTED);
         builder.addParameter(ParameterizedTypeName.get(List.class, Variable.class), "variables");
-        recoverAndCallMethodWithVariables(builder, "operators");
+        builder.addStatement("$1T $2L = operatorClass($1T.class)", typeUnifier.getOperatorsType(), "operator");
+        recoverAndCallMethodWithVariables(builder, "operator");
         return builder.build();
     }
 
@@ -106,11 +96,9 @@ class SpecUnifier {
         builder.addParameter(ParameterizedTypeName.get(List.class, Variable.class), "variables");
         builder.returns(StateTransition.class);
         builder.addException(Throwable.class);
-        if (typeUnifier.existsSystemAction()) {
-            recoverAndCallMethodWithVariables(builder, "systemActions");
-        } else {
-            builder.addStatement("return new $T()", GStateTransition.class);
-        }
+        builder.addStatement("$1T $2L = operatorClass($1T.class)", typeUnifier.getOperatorsType(), "system");
+        builder.addStatement("if(system == null) return new $T()", EmptyTransition.class);
+        recoverAndCallMethodWithVariables(builder, "system");
         return builder.build();
     }
 

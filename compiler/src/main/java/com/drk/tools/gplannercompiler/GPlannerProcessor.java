@@ -7,7 +7,7 @@ import com.drk.tools.gplannercompiler.gen.unifier.UnifierGenerator;
 import com.drk.tools.gplannercompiler.gen.variables.VariableGenerator;
 import com.drk.tools.gplannercore.annotations.Operator;
 import com.drk.tools.gplannercore.annotations.SystemAction;
-import com.drk.tools.gplannercore.annotations.core.Collection;
+import com.drk.tools.gplannercore.annotations.core.Range;
 import com.drk.tools.gplannercore.annotations.core.Unifier;
 import com.drk.tools.gplannercore.annotations.variables.CollectionRange;
 import com.drk.tools.gplannercore.annotations.variables.EnumRange;
@@ -19,7 +19,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +50,7 @@ public class GPlannerProcessor extends AbstractProcessor {
         annotations.add(SystemAction.class.getCanonicalName());
 
         annotations.add(Unifier.class.getCanonicalName());
-        annotations.add(Collection.class.getCanonicalName());
+        annotations.add(Range.class.getCanonicalName());
         return annotations;
     }
 
@@ -96,7 +95,7 @@ public class GPlannerProcessor extends AbstractProcessor {
 
     private void processUnifiers(RoundEnvironment roundEnv) throws GenException {
         Set<? extends Element> unifiers = roundEnv.getElementsAnnotatedWith(Unifier.class);
-        Set<? extends Element> collections = roundEnv.getElementsAnnotatedWith(Collection.class);
+        Set<? extends Element> collections = roundEnv.getElementsAnnotatedWith(Range.class);
         if (unifiers.isEmpty()) {
             return;
         }

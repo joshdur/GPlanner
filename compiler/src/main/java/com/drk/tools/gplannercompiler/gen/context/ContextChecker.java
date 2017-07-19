@@ -3,9 +3,10 @@ package com.drk.tools.gplannercompiler.gen.context;
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
 import com.drk.tools.gplannercompiler.gen.variables.support.Checker;
-import com.drk.tools.gplannercore.core.main.Operators;
-import com.drk.tools.gplannercore.core.main.SystemActions;
+import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.variables.collection.CollectionVariableRange;
+import com.drk.tools.gplannercore.core.variables.enumvars.EnumVariableRange;
+import com.drk.tools.gplannercore.core.variables.numeric.NumericVariableRange;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
@@ -32,14 +33,7 @@ class ContextChecker {
     private void checkUnifier(Element element) throws GenException {
         Checker.assertIsClass(element);
         Checker.assertPublicConstructorCount(element, 1);
-
-        try {
-            Checker.assertConstructorVariableCount(element, 2);
-            Checker.assertConstructorVariableType(element, types, Operators.class, SystemActions.class);
-        } catch (GenException e) {
-            Checker.assertConstructorVariableCount(element, 1);
-            Checker.assertConstructorVariableType(element,types, Operators.class);
-        }
+        Checker.assertConstructorVariableType(element, types, Context.class);
     }
 
     void checkCollections(Set<? extends Element> collections) throws GenException {
@@ -51,10 +45,16 @@ class ContextChecker {
 
     private void checkCollection(Element element) throws GenException {
         Checker.assertIsClass(element);
-        Checker.assertExtension(element, CollectionVariableRange.class, types);
+        try {
+            Checker.assertExtension(element, CollectionVariableRange.class, types);
+        } catch (GenException ignored1) {
+            try {
+                Checker.assertExtension(element, NumericVariableRange.class, types);
+            } catch (GenException ignored2) {
+                Checker.assertExtension(element, EnumVariableRange.class, types);
+            }
+        }
     }
-
-
 
 
 }

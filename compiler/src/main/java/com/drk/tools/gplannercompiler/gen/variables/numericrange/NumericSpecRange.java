@@ -1,6 +1,7 @@
 package com.drk.tools.gplannercompiler.gen.variables.numericrange;
 
 import com.drk.tools.gplannercompiler.Logger;
+import com.drk.tools.gplannercore.annotations.core.Range;
 import com.drk.tools.gplannercore.core.variables.numeric.NumericVariableRange;
 import com.squareup.javapoet.*;
 
@@ -22,6 +23,7 @@ class NumericSpecRange {
 
     TypeSpec getTypeSpec() {
         return TypeSpec.classBuilder(type.getClassName())
+                .addAnnotation(getAnnotationSpec())
                 .addModifiers(Modifier.PUBLIC)
                 .superclass(ParameterizedTypeName.get(ClassName.get(NumericVariableRange.class), type.getInstanceTypeName()))
                 .addMethod(getConstructor())
@@ -29,14 +31,21 @@ class NumericSpecRange {
                 .build();
     }
 
-    private MethodSpec getConstructor(){
+    private AnnotationSpec getAnnotationSpec() {
+        return AnnotationSpec.builder(Range.class)
+                .addMember("isDynamic", "$L", false)
+                .build();
+    }
+
+
+    private MethodSpec getConstructor() {
         return MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
                 .addCode("super($L,$L);", type.getStartValue(), type.getEndValue())
                 .build();
     }
 
-    private MethodSpec getVariableOfMethod(){
+    private MethodSpec getVariableOfMethod() {
         return MethodSpec.methodBuilder("variableOf")
                 .addModifiers(Modifier.PROTECTED)
                 .returns(type.getInstanceTypeName())

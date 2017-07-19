@@ -3,8 +3,7 @@ package com.drk.tools.gplannercompiler.gen.unifier;
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
 import com.drk.tools.gplannercompiler.gen.variables.support.Checker;
-import com.drk.tools.gplannercore.core.main.Operators;
-import com.drk.tools.gplannercore.core.main.SystemActions;
+import com.drk.tools.gplannercore.core.main.BaseOperators;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.variables.Variable;
 
@@ -25,11 +24,11 @@ class UnifierChecker {
     void check(Set<? extends Element> operators, Set<? extends Element> systemActions) throws GenException {
         logger.log(this, "Checking operators class");
         for (Element operator : operators) {
-            checkMethod(operator, Operators.class);
+            checkMethod(operator, BaseOperators.class);
         }
         logger.log(this, "Checking systemActions class");
         for (Element action : systemActions) {
-            checkMethod(action, SystemActions.class);
+            checkMethod(action, BaseOperators.class);
         }
     }
 

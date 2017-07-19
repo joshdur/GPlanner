@@ -1,4 +1,4 @@
-package com.drk.tools.gplannercore.core.atoms;
+package com.drk.tools.gplannercore.planner.state.atoms;
 
 import com.drk.tools.gplannercore.core.variables.Variable;
 

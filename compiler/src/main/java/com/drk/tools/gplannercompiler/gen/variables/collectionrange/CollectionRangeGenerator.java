@@ -27,12 +27,12 @@ public class CollectionRangeGenerator {
         if (collectionRanges.isEmpty()) {
             return new LinkedHashMap<>();
         }
-        logger.log(this, "Generate Collection Ranges...");
+        logger.log(this, "Generate Range Ranges...");
         checker.check(collectionRanges);
         logger.log(this, "Building Specs");
         List<CollectionTypeRange> types = buildTypes();
         List<CollectionSpecRange> specs = buildSpecs(types);
-        logger.log(this, "Generating Collection ranges");
+        logger.log(this, "Generating Range ranges");
         generate(specs, filer);
         return mapOfRanges(types);
     }

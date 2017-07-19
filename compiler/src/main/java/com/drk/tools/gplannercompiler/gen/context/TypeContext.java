@@ -2,16 +2,15 @@ package com.drk.tools.gplannercompiler.gen.context;
 
 import com.drk.tools.gplannercompiler.gen.GenException;
 import com.drk.tools.gplannercompiler.gen.variables.support.Extractor;
-import com.drk.tools.gplannercore.core.main.Operators;
-import com.drk.tools.gplannercore.core.main.SystemActions;
+import com.drk.tools.gplannercore.annotations.core.Range;
+import com.drk.tools.gplannercore.annotations.core.Unifier;
+import com.drk.tools.gplannercore.core.main.BaseOperators;
 import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.element.*;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.drk.tools.gplannercompiler.gen.variables.support.Extractor.getVariableName;
 
@@ -38,50 +37,39 @@ class TypeContext {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    Set<TypeAndName> getOperatorsTypes() throws GenException {
-        Set<TypeAndName> typeAndNames = new HashSet<>();
-        for (TypeElement unifier : unifiers) {
-            TypeElement operators = getVariable(unifier, Operators.class);
-            if (operators == null) {
-                String canonical = Operators.class.getCanonicalName();
-                String unifierName = getVariableName(unifier);
-                throw new GenException(String.format("Not found %s as a parameter of constructor in %s", canonical, unifierName));
-            }
-            typeAndNames.add(new TypeAndName(TypeName.get(operators.asType()), getVariableName(operators)));
-        }
-        return typeAndNames;
-    }
-
-    Set<TypeAndName> getSystemActionTypes() {
-        Set<TypeAndName> typeAndNames = new HashSet<>();
-        for (TypeElement unifier : unifiers) {
-            TypeElement systemActions = getVariable(unifier, SystemActions.class);
-            if (systemActions != null) {
-                typeAndNames.add(new TypeAndName(TypeName.get(systemActions.asType()), getVariableName(systemActions)));
+    Set<String> getOperatorClasses() {
+        Set<String> operatorClasses = new HashSet<>();
+        for (TypeElement baseUnifier : unifiers) {
+            Unifier unifier = baseUnifier.getAnnotation(Unifier.class);
+            if (unifier != null) {
+                operatorClasses.addAll(Arrays.asList(unifier.operatorClasses()));
             }
         }
-        return typeAndNames;
+        return operatorClasses;
     }
 
     List<InstanceData> getUnifierInstanceData() {
         List<InstanceData> datas = new ArrayList<>();
         for (TypeElement unifier : unifiers) {
-            TypeElement operators = getVariable(unifier, Operators.class);
-            TypeElement systemActions = getVariable(unifier, SystemActions.class);
+            TypeElement operators = getVariable(unifier, BaseOperators.class);
             String nameOperators = getVariableName(operators);
-            String nameActions = getVariableName(systemActions);
-            InstanceData data = new InstanceData(TypeName.get(unifier.asType()), nameOperators, nameActions);
+            InstanceData data = new InstanceData(TypeName.get(unifier.asType()), nameOperators, null);
             datas.add(data);
         }
         return datas;
     }
 
-    List<CollectionElement> getCollectionElements() {
-        List<CollectionElement> collectionElements = new ArrayList<>();
+    List<RangeElement> getCollectionElements() throws GenException {
+        List<RangeElement> rangeElements = new ArrayList<>();
         for (Element element : collections) {
-            collectionElements.add(new CollectionElement(TypeName.get(element.asType()), getVariableName(element)));
+            TypeName rangeTypeName = TypeName.get(element.asType());
+            List<TypeMirror> parameters = Extractor.getParametersOfSuperclass(element);
+            TypeName variableTypeName = TypeName.get(parameters.get(0));
+            String name = Extractor.getMethodName("get", element.getSimpleName().toString());
+            Range range = element.getAnnotation(Range.class);
+            rangeElements.add(new RangeElement(range.isDynamic(), rangeTypeName, variableTypeName, name));
         }
-        return collectionElements;
+        return rangeElements;
     }
 
 
@@ -102,13 +90,17 @@ class TypeContext {
         return null;
     }
 
-    public static class CollectionElement {
-        public final TypeName typeName;
-        public final String name;
+    static class RangeElement {
+        final boolean isDynamic;
+        final TypeName rangeTypeName;
+        final TypeName variableTypeName;
+        final String variableName;
 
-        public CollectionElement(TypeName typeName, String name) {
-            this.typeName = typeName;
-            this.name = name;
+        RangeElement(boolean isDynamic, TypeName rangeTypeName, TypeName variableTypeName, String variableName) {
+            this.isDynamic = isDynamic;
+            this.rangeTypeName = rangeTypeName;
+            this.variableTypeName = variableTypeName;
+            this.variableName = variableName;
         }
     }
 }

@@ -10,13 +10,4 @@ public class Stuff extends CollectionVariable<String> {
         super(value);
     }
 
-    @Override
-    protected int toHashCode(String value) {
-        return value.hashCode();
-    }
-
-    @Override
-    protected String getStringName(String value) {
-        return value;
-    }
 }

@@ -1,12 +1,16 @@
 package com.drk.tools.gplannersample;
 
 import com.drk.tools.gplannercore.annotations.SystemAction;
-import com.drk.tools.gplannercore.core.main.SystemActions;
+import com.drk.tools.gplannercore.core.Context;
+import com.drk.tools.gplannercore.core.main.BaseOperators;
 import com.drk.tools.gplannercore.core.state.StateTransition;
-import com.drk.tools.gplannersample.Monkey.*;
 import com.drk.tools.gplannersample.vars.Location;
 
-public class MonkeySystem extends SystemActions {
+public class MonkeySystem extends BaseOperators {
+
+    public MonkeySystem(Context context) {
+        super(context);
+    }
 
     @SystemAction
     public StateTransition climbDown(Location x) {

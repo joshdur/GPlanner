@@ -1,8 +1,8 @@
-package com.drk.tools.gplannercore.planner.state.debug;
+package com.drk.tools.gplannercore.planner.state;
 
-import com.drk.tools.gplannercore.core.atoms.Atom;
-import com.drk.tools.gplannercore.core.atoms.BinaryAtom;
-import com.drk.tools.gplannercore.core.atoms.TernaryAtom;
+import com.drk.tools.gplannercore.planner.state.atoms.Atom;
+import com.drk.tools.gplannercore.planner.state.atoms.BinaryAtom;
+import com.drk.tools.gplannercore.planner.state.atoms.TernaryAtom;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.variables.Variable;
 

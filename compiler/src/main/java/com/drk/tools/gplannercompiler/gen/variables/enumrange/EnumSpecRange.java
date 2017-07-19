@@ -2,6 +2,7 @@ package com.drk.tools.gplannercompiler.gen.variables.enumrange;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
+import com.drk.tools.gplannercore.annotations.core.Range;
 import com.drk.tools.gplannercore.core.variables.enumvars.EnumVariableRange;
 import com.squareup.javapoet.*;
 
@@ -23,6 +24,7 @@ class EnumSpecRange {
 
     TypeSpec getTypeSpec() throws GenException {
         TypeSpec.Builder builder = TypeSpec.classBuilder(type.getClassName())
+                .addAnnotation(getAnnotationSpec())
                 .addModifiers(Modifier.PUBLIC)
                 .superclass(ParameterizedTypeName.get(ClassName.get(EnumVariableRange.class), type.getInstanceTypeName()))
                 .addMethod(getConstructor())
@@ -32,6 +34,12 @@ class EnumSpecRange {
             builder.addField(getFieldSpec(enumType));
         }
         return builder.build();
+    }
+
+    private AnnotationSpec getAnnotationSpec(){
+        return AnnotationSpec.builder(Range.class)
+                .addMember("isDynamic", "$L", false)
+                .build();
     }
 
     private FieldSpec getFieldSpec(EnumTypeRange.EnumType enumType){

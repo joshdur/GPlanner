@@ -3,7 +3,6 @@ package com.drk.tools.gplannercompiler.gen.context;
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.CompilerFiler;
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercore.annotations.core.Unifier;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -13,14 +12,14 @@ import java.util.*;
 public class ContextGenerator {
 
     private final Set<? extends Element> unifiers;
-    private final Set<? extends Element> collections;
+    private final Set<? extends Element> ranges;
     private final Types types;
     private final Logger logger;
     private final ContextChecker contextChecker;
 
-    public ContextGenerator(Set<? extends Element> unifiers, Set<? extends Element> collections, Types types, Logger logger) {
+    public ContextGenerator(Set<? extends Element> unifiers, Set<? extends Element> ranges, Types types, Logger logger) {
         this.unifiers = unifiers;
-        this.collections = collections;
+        this.ranges = ranges;
         this.types = types;
         this.logger = logger;
         this.contextChecker = new ContextChecker(logger, types);
@@ -29,7 +28,7 @@ public class ContextGenerator {
     public void generate(CompilerFiler filer) throws GenException {
         logger.log(this, "Generate domains...");
         contextChecker.check(unifiers);
-        contextChecker.checkCollections(collections);
+        contextChecker.checkCollections(ranges);
         logger.log(this, "Building Specs");
         List<SpecContext> specs = buildSpecs();
         logger.log(this, "Start generating domains");
@@ -52,27 +51,11 @@ public class ContextGenerator {
 
     private List<TypeContext> buildTypes() {
         logger.log(this, "Building Types for Specs");
-        HashMap<String, Set<TypeElement>> hashUnifiers = new LinkedHashMap<>();
+        Set<TypeElement> typeUnifiers = new HashSet<>();
         for (Element element : unifiers) {
-            addToHashMap(hashUnifiers, element);
+            typeUnifiers.add((TypeElement) element);
         }
-        List<TypeContext> typeContexts = new ArrayList<>();
-        for (Map.Entry<String, Set<TypeElement>> entry : hashUnifiers.entrySet()) {
-            TypeContext typeContext = new TypeContext(entry.getKey(), entry.getValue(), collections, types);
-            typeContexts.add(typeContext);
-        }
-        return typeContexts;
+        return Collections.singletonList(new TypeContext("default", typeUnifiers, ranges, types));
     }
 
-    private void addToHashMap(HashMap<String, Set<TypeElement>> hashUnifiers, Element element) {
-        TypeElement typeElement = (TypeElement) element;
-        Unifier unifier = element.getAnnotation(Unifier.class);
-        String domain = unifier.from();
-        Set<TypeElement> typeElements = hashUnifiers.get(domain);
-        if (typeElements == null) {
-            typeElements = new HashSet<>();
-            hashUnifiers.put(domain, typeElements);
-        }
-        typeElements.add(typeElement);
-    }
 }

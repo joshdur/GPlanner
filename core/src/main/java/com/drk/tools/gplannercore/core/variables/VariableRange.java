@@ -5,4 +5,6 @@ public interface VariableRange<T extends Variable> {
     int count();
 
     T variableAt(int position);
+
+
 }
