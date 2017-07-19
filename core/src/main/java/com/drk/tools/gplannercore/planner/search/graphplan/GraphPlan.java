@@ -7,7 +7,7 @@ import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
-import com.drk.tools.gplannercore.planner.search.context.SearchContext;
+import com.drk.tools.gplannercore.core.search.context.SearchContext;
 import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.UnifierBuilder;

@@ -1,4 +1,4 @@
-package com.drk.tools.gplannercore.planner.search.context;
+package com.drk.tools.gplannercore.core.search.context;
 
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Transition;
