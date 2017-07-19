@@ -2,7 +2,6 @@ package com.drk.tools.gplannercompiler.gen.context;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercore.core.Bundle;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.main.BaseUnifier;
 import com.squareup.javapoet.MethodSpec;
@@ -10,8 +9,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,31 +34,21 @@ class SpecContext {
         TypeSpec.Builder builder = TypeSpec.classBuilder(String.format(DOMAIN_NAME, typeContext.getClassName()));
         builder.superclass(Context.class);
         builder.addModifiers(Modifier.PUBLIC);
-        addFields(builder, typeContext.getOperatorsTypes());
-        addFields(builder, typeContext.getSystemActionTypes());
         builder.addMethod(getConstructor());
-        builder.addMethod(getConstructorWithBundle());
+        builder.addMethod(getConstructorWithBoolean());
         builder.addMethod(getUnifiers());
+        addDynamicVariableMethods(builder, typeContext.getCollectionElements());
         return builder.build();
     }
 
-    private void addFields(TypeSpec.Builder builder, Collection<TypeAndName> types) {
-        logger.log(this, "- Adding Fields");
-        for (TypeAndName type : types) {
-            builder.addField(type.typeName, type.name, Modifier.PRIVATE, Modifier.FINAL);
-        }
-    }
-
-    private MethodSpec getConstructorWithBundle() throws GenException {
-        logger.log(this, "- Building constructor with bundle");
+    private MethodSpec getConstructorWithBoolean() throws GenException {
+        logger.log(this, "- Building constructor with mapper");
         MethodSpec.Builder builder = MethodSpec.constructorBuilder();
         builder.addModifiers(Modifier.PUBLIC);
-        builder.addParameter(Bundle.class, "bundle");
-        builder.addStatement("super(bundle)");
-        addNewInstances(builder, typeContext.getOperatorsTypes());
-        addNewInstances(builder, typeContext.getSystemActionTypes());
-        setBundles(builder, typeContext.getOperatorsTypes());
-        setBundles(builder, typeContext.getSystemActionTypes());
+        builder.addParameter(Boolean.class, "isDebug");
+        builder.addStatement("super(isDebug)");
+        addNewInstances(builder, typeContext.getOperatorClasses());
+        addVariables(builder, typeContext.getCollectionElements());
         return builder.build();
     }
 
@@ -69,20 +56,33 @@ class SpecContext {
         logger.log(this, "- Building constructor");
         MethodSpec.Builder builder = MethodSpec.constructorBuilder();
         builder.addModifiers(Modifier.PUBLIC);
-        builder.addStatement("this(new Bundle())");
+        builder.addStatement("this(false)");
         return builder.build();
     }
 
-    private void addNewInstances(MethodSpec.Builder builder, Collection<TypeAndName> types) {
-        for (TypeAndName type : types) {
-            builder.addStatement("this.$1L = new $2T()", type.name, type.typeName);
+    private void addNewInstances(MethodSpec.Builder builder, Collection<String> operatorClasses) {
+        for (String literal : operatorClasses) {
+            builder.addStatement("this.addOperatorToInject(new $L(this))", literal);
         }
     }
 
-    private void setBundles(MethodSpec.Builder builder, Collection<TypeAndName> types) {
-        for (TypeAndName type : types) {
-            builder.addStatement("this.$1L.setBundle(bundle)", type.name);
+    private void addVariables(MethodSpec.Builder builder, Collection<TypeContext.RangeElement> rangeElements) {
+        for (TypeContext.RangeElement rangeElement : rangeElements) {
+            builder.addStatement("this.addVariable($T.class, new $T())", rangeElement.variableTypeName, rangeElement.rangeTypeName);
         }
+    }
+
+    private void addDynamicVariableMethods(TypeSpec.Builder builder, Collection<TypeContext.RangeElement> rangeElements) {
+        for (TypeContext.RangeElement rangeElement : rangeElements) {
+            if (rangeElement.isDynamic) {
+                builder.addMethod(MethodSpec.methodBuilder(rangeElement.variableName)
+                        .returns(rangeElement.rangeTypeName)
+                        .addStatement("return ($T) injectRangeFromVariableClass($T.class)", rangeElement.rangeTypeName, rangeElement.variableTypeName)
+                        .build())
+                        .build();
+            }
+        }
+
     }
 
     private MethodSpec getUnifiers() {
@@ -94,11 +94,7 @@ class SpecContext {
         builder.addStatement("$1T<$2T> unifiers = new $3T<$2T>()", List.class, BaseUnifier.class, ArrayList.class);
         List<InstanceData> unifiers = typeContext.getUnifierInstanceData();
         for (InstanceData data : unifiers) {
-            if (data.hasSystemActions()) {
-                builder.addStatement("unifiers.add(new $1T($2L, $3L))", data.unifier, data.operatorsName, data.systemActionsName);
-            } else {
-                builder.addStatement("unifiers.add(new $1T($2L))", data.unifier, data.operatorsName);
-            }
+            builder.addStatement("unifiers.add(new $1T(this))", data.unifier);
         }
         builder.addStatement("return unifiers");
         return builder.build();

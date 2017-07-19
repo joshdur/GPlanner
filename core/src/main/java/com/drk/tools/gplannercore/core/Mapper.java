@@ -3,16 +3,16 @@ package com.drk.tools.gplannercore.core;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class Bundle {
+class Mapper {
 
-    private final HashMap<String, Object> bundle = new LinkedHashMap<>();
+    private final HashMap<Class, Object> bundle = new LinkedHashMap<>();
 
-    public void set(String key, Object object){
+    public void set(Class key, Object object) {
         bundle.put(key, object);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T get(String key, Class<T> t){
+    public <T> T get(Class<T> key) {
         return (T) bundle.get(key);
     }
 

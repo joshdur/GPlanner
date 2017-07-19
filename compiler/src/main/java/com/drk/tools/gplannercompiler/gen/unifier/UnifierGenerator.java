@@ -7,6 +7,7 @@ import com.drk.tools.gplannercompiler.gen.GenException;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.*;
 
@@ -15,13 +16,15 @@ public class UnifierGenerator {
 
     private final Set<? extends Element> operators;
     private final Set<? extends Element> systemActions;
+    private final HashMap<String, String> ranges;
     private final Logger logger;
     private final UnifierChecker unifierChecker;
 
-    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, Logger logger, Types types) {
+    public UnifierGenerator(Set<? extends Element> operators, Set<? extends Element> systemActions, HashMap<String, String> ranges, Logger logger, Types types) {
         this.operators = operators;
         this.systemActions = systemActions;
         this.logger = logger;
+        this.ranges = ranges;
         this.unifierChecker = new UnifierChecker(logger, types);
     }
 
@@ -61,7 +64,7 @@ public class UnifierGenerator {
         for (Container container : hashTypes.values()) {
             if (container.hasValidOperator()) {
                 unifierChecker.checkSameVariables(container);
-                types.add(new TypeUnifier(container.name, container.operator, container.systemAction, container.operatorVariables));
+                types.add(new TypeUnifier(container.name, container.operator, container.systemAction, container.operatorVariables, ranges));
             }
         }
         return types;
