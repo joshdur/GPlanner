@@ -1,6 +1,8 @@
 package com.drk.tools.gplannercore.planner.state;
 
-import com.drk.tools.gplannercore.core.Atom;
+import com.drk.tools.gplannercore.core.atoms.Atom;
+import com.drk.tools.gplannercore.core.atoms.BinaryAtom;
+import com.drk.tools.gplannercore.core.atoms.TernaryAtom;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.variables.Variable;
@@ -54,6 +56,14 @@ public class GStateTransition implements StateTransition {
         return check(GStatement.from(a, v));
     }
 
+    public <V1 extends Variable, V2 extends Variable> GStateTransition check(BinaryAtom<V1, V2> atom, V1 v1, V2 v2) {
+        return check(GStatement.from(atom, v1, v2));
+    }
+
+    public <V1 extends Variable, V2 extends Variable, V3 extends Variable> GStateTransition check(TernaryAtom<V1, V2, V3> atom, V1 v1, V2 v2, V3 v3) {
+        return check(GStatement.from(atom, v1, v2, v3));
+    }
+
     public GStateTransition check(Statement statement) {
         positivePreconditions.add(statement);
         return this;
@@ -68,6 +78,15 @@ public class GStateTransition implements StateTransition {
         return set(GStatement.from(a, v));
     }
 
+
+    public <V1 extends Variable, V2 extends Variable> GStateTransition set(BinaryAtom<V1, V2> atom, V1 v1, V2 v2) {
+        return set(GStatement.from(atom, v1, v2));
+    }
+
+    public <V1 extends Variable, V2 extends Variable, V3 extends Variable> GStateTransition set(TernaryAtom<V1, V2, V3> atom, V1 v1, V2 v2, V3 v3) {
+        return set(GStatement.from(atom, v1, v2, v3));
+    }
+
     public GStateTransition set(Statement statement) {
         positiveEffects.add(statement);
         return this;
@@ -80,6 +99,14 @@ public class GStateTransition implements StateTransition {
 
     public <V extends Variable> GStateTransition not(Atom<V> a, V v) {
         return not(GStatement.from(a, v));
+    }
+
+    public <V1 extends Variable, V2 extends Variable> GStateTransition not(BinaryAtom<V1, V2> atom, V1 v1, V2 v2) {
+        return not(GStatement.from(atom, v1, v2));
+    }
+
+    public <V1 extends Variable, V2 extends Variable, V3 extends Variable> GStateTransition not(TernaryAtom<V1, V2, V3> atom, V1 v1, V2 v2, V3 v3) {
+        return not(GStatement.from(atom, v1, v2, v3));
     }
 
     public GStateTransition not(Statement statement) {

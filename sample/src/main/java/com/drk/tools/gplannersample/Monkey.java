@@ -1,7 +1,7 @@
 package com.drk.tools.gplannersample;
 
 import com.drk.tools.gplannercore.annotations.Operator;
-import com.drk.tools.gplannercore.core.Atom;
+import com.drk.tools.gplannercore.core.atoms.Atom;
 import com.drk.tools.gplannercore.core.main.Operators;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.planner.state.GStateTransition;
@@ -57,18 +57,18 @@ public class Monkey extends Operators {
     }
 
 
-    public static class At extends Atom<Location> {
+    public static class At implements Atom<Location> {
     }
 
-    public static class BoxAt extends Atom<Location> {
+    public static class BoxAt implements Atom<Location> {
     }
 
-    public static class BananasAt extends Atom<Location> {
+    public static class BananasAt implements Atom<Location> {
     }
 
-    public static class Have extends Atom<Thing> {
+    public static class Have implements Atom<Thing> {
     }
 
-    public static class Level extends Atom<LevelState> {
+    public static class Level implements Atom<LevelState> {
     }
 }

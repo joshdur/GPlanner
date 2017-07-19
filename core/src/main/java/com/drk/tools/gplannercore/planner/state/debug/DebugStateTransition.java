@@ -1,6 +1,6 @@
 package com.drk.tools.gplannercore.planner.state.debug;
 
-import com.drk.tools.gplannercore.core.Atom;
+import com.drk.tools.gplannercore.core.atoms.Atom;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.variables.Variable;
