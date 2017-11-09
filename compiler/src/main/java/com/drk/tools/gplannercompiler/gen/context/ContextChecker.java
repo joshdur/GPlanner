@@ -2,7 +2,8 @@ package com.drk.tools.gplannercompiler.gen.context;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercompiler.gen.variables.support.Checker;
+import com.drk.tools.gplannercompiler.gen.base.Checker;
+import com.drk.tools.gplannercompiler.gen.support.CheckerSupport;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.variables.collection.CollectionVariableRange;
 import com.drk.tools.gplannercore.core.variables.enumvars.EnumVariableRange;
@@ -12,18 +13,20 @@ import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
 import java.util.Set;
 
-class ContextChecker {
+public class ContextChecker implements Checker {
 
+    private final Set<? extends Element> unifiers;
     private final Logger logger;
     private final Types types;
 
-    ContextChecker(Logger logger, Types types) {
+    public ContextChecker(Set<? extends Element> unifiers, Logger logger, Types types) {
+        this.unifiers = unifiers;
         this.logger = logger;
         this.types = types;
     }
 
-
-    void check(Set<? extends Element> unifiers) throws GenException {
+    @Override
+    public void check() throws GenException {
         logger.log(this, "Checking unifier classes");
         for (Element element : unifiers) {
             checkUnifier(element);
@@ -31,9 +34,9 @@ class ContextChecker {
     }
 
     private void checkUnifier(Element element) throws GenException {
-        Checker.assertIsClass(element);
-        Checker.assertPublicConstructorCount(element, 1);
-        Checker.assertConstructorVariableType(element, types, Context.class);
+        CheckerSupport.assertIsClass(element);
+        CheckerSupport.assertPublicConstructorCount(element, 1);
+        CheckerSupport.assertConstructorVariableType(element, types, Context.class);
     }
 
     void checkCollections(Set<? extends Element> collections) throws GenException {
@@ -44,14 +47,14 @@ class ContextChecker {
     }
 
     private void checkCollection(Element element) throws GenException {
-        Checker.assertIsClass(element);
+        CheckerSupport.assertIsClass(element);
         try {
-            Checker.assertExtension(element, CollectionVariableRange.class, types);
+            CheckerSupport.assertExtension(element, CollectionVariableRange.class, types);
         } catch (GenException ignored1) {
             try {
-                Checker.assertExtension(element, NumericVariableRange.class, types);
+                CheckerSupport.assertExtension(element, NumericVariableRange.class, types);
             } catch (GenException ignored2) {
-                Checker.assertExtension(element, EnumVariableRange.class, types);
+                CheckerSupport.assertExtension(element, EnumVariableRange.class, types);
             }
         }
     }

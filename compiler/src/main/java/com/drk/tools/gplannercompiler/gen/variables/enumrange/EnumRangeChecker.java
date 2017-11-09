@@ -2,7 +2,8 @@ package com.drk.tools.gplannercompiler.gen.variables.enumrange;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercompiler.gen.variables.support.Checker;
+import com.drk.tools.gplannercompiler.gen.base.Checker;
+import com.drk.tools.gplannercompiler.gen.support.CheckerSupport;
 import com.drk.tools.gplannercore.annotations.variables.EnumRange;
 import com.drk.tools.gplannercore.core.variables.enumvars.EnumVariable;
 
@@ -13,17 +14,20 @@ import javax.lang.model.util.Types;
 import java.util.List;
 import java.util.Set;
 
-class EnumRangeChecker {
+public class EnumRangeChecker implements Checker {
 
+    private final Set<? extends Element> enumRanges;
     private final Logger logger;
     private final Types types;
 
-    EnumRangeChecker(Logger logger, Types types) {
+    public EnumRangeChecker(Set<? extends Element> enumRanges, Logger logger, Types types) {
+        this.enumRanges = enumRanges;
         this.logger = logger;
         this.types = types;
     }
 
-    void checkEnums(Set<? extends Element> enumRanges) throws GenException {
+    @Override
+    public void check() throws GenException {
         logger.log(this, "Checking enumRanges");
         for (Element e : enumRanges) {
             checkElement(e);
@@ -32,12 +36,12 @@ class EnumRangeChecker {
 
     private void checkElement(Element element) throws GenException {
         checkEnumRange(element);
-        Checker.assertIsPublic(element);
-        Checker.assertExtension(element, EnumVariable.class, types);
-        Checker.assertPublicConstructorCount(element, 1);
+        CheckerSupport.assertIsPublic(element);
+        CheckerSupport.assertExtension(element, EnumVariable.class, types);
+        CheckerSupport.assertPublicConstructorCount(element, 1);
 
-        Checker.assertConstructorVariableCount(element, 1);
-        Checker.assertConstructorVariableType(element,types, Enum.class);
+        CheckerSupport.assertConstructorVariableCount(element, 1);
+        CheckerSupport.assertConstructorVariableType(element, types, Enum.class);
     }
 
     private void checkEnumRange(Element element) throws GenException {
@@ -45,17 +49,17 @@ class EnumRangeChecker {
         EnumRange enumRange = element.getAnnotation(EnumRange.class);
         try {
             Class eClass = enumRange.enumClass();
-            logger.log(this,"class--   "  + eClass.getCanonicalName());
+            logger.log(this, "class--   " + eClass.getCanonicalName());
             if (!eClass.getSuperclass().equals(Enum.class)) {
                 throw new GenException(name + " enumClass should be an Enum");
             }
         } catch (MirroredTypeException e) {
             TypeMirror typeMirror = e.getTypeMirror();
-            logger.log(this,"typeMirror--   "  + typeMirror.toString());
+            logger.log(this, "typeMirror--   " + typeMirror.toString());
 
             List<? extends TypeMirror> supertypes = types.directSupertypes(typeMirror);
             TypeMirror supertype = supertypes.get(0);
-            logger.log(this,"syperTypeMirror--   "  + supertype.toString());
+            logger.log(this, "syperTypeMirror--   " + supertype.toString());
 
             if (!supertype.toString().contains(Enum.class.getCanonicalName())) {
                 throw new GenException(name + " enumClass should be an Enum");

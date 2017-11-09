@@ -2,13 +2,14 @@ package com.drk.tools.gplannercompiler.gen.variables.collectionrange;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
+import com.drk.tools.gplannercompiler.gen.base.Spec;
 import com.drk.tools.gplannercore.annotations.core.Range;
 import com.drk.tools.gplannercore.core.variables.collection.CollectionVariableRange;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 
-class CollectionSpecRange {
+class CollectionSpecRange implements Spec {
 
     private final CollectionTypeRange type;
     private final Logger logger;
@@ -18,11 +19,11 @@ class CollectionSpecRange {
         this.logger = logger;
     }
 
-    String getPackage() {
+    public String getPackage() {
         return type.getPackage();
     }
 
-    TypeSpec getTypeSpec() throws GenException {
+    public TypeSpec getTypeSpec() throws GenException {
         return TypeSpec.classBuilder(type.getClassName())
                 .addAnnotation(getAnnotationSpec())
                 .addModifiers(Modifier.PUBLIC)
@@ -31,7 +32,7 @@ class CollectionSpecRange {
                 .build();
     }
 
-    private AnnotationSpec getAnnotationSpec(){
+    private AnnotationSpec getAnnotationSpec() {
         return AnnotationSpec.builder(Range.class)
                 .addMember("isDynamic", "$L", true)
                 .build();

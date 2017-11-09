@@ -17,21 +17,32 @@ public abstract class BaseUnifier {
     private final Integer[] counts;
     private final int code;
     private final StateCounter stateCounter;
+    private final boolean isValidUnifier;
 
     public BaseUnifier(Context context, String operatorName) {
         this.context = context;
         this.operatorName = operatorName;
-        this.variableRanges = getVariables();
+        this.variableRanges = getVariables(context);
         this.counts = getCounts();
         this.code = operatorName.hashCode();
         this.stateCounter = new StateCounter(counts);
+        this.isValidUnifier = checkValidCounts();
+    }
+
+    private boolean checkValidCounts() {
+        for (Integer count : counts) {
+            if (count == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected <T> T operatorClass(Class<T> tClass) {
         return context.injectOperator(tClass);
     }
 
-    protected abstract List<VariableRange> getVariables();
+    protected abstract List<VariableRange> getVariables(Context context);
 
     private Integer[] getCounts() {
         List<Integer> counts = new ArrayList<>();
@@ -46,21 +57,29 @@ public abstract class BaseUnifier {
     }
 
     public boolean hasNext() {
-        return stateCounter.hasNext();
+        return isValidUnifier && stateCounter.hasNext();
     }
 
     public Transition next() {
-        List<Integer> variablePositions = stateCounter.currentValues();
-        StateTransition stateTransition = build(recoverVariables(variablePositions));
-        int counterPosition = stateCounter.getPosition();
-        stateCounter.next();
-        return new Transition(code, counterPosition, stateTransition);
+        if (isValidUnifier) {
+            List<Integer> variablePositions = stateCounter.currentValues();
+            StateTransition stateTransition = build(recoverVariables(variablePositions));
+            int counterPosition = stateCounter.getPosition();
+            stateCounter.next();
+            return new Transition(code, counterPosition, stateTransition);
+        } else {
+            return new Transition(code, -1, new EmptyTransition());
+        }
     }
 
     public String asString(Transition transition) {
-        StateCounter stateCounter = new StateCounter(transition.variableStateCode, counts);
-        List<Variable> variables = recoverVariables(stateCounter.currentValues());
-        return String.format("%s %s", operatorName, variables.toString());
+        if (isValidUnifier && transition.variableStateCode != -1) {
+            StateCounter stateCounter = new StateCounter(transition.variableStateCode, counts);
+            List<Variable> variables = recoverVariables(stateCounter.currentValues());
+            return String.format("%s %s", operatorName, variables.toString());
+        } else {
+            return String.format("%s %s", operatorName, "---");
+        }
     }
 
     private List<Variable> recoverVariables(List<Integer> variablePositions) {
@@ -76,10 +95,14 @@ public abstract class BaseUnifier {
     }
 
     public Transition execute(Transition transition) throws Throwable {
-        StateCounter stateCounter = new StateCounter(transition.variableStateCode, counts);
-        List<Integer> variablePositions = stateCounter.currentValues();
-        StateTransition stateTransition = execute(recoverVariables(variablePositions));
-        return new Transition(code, transition.variableStateCode, stateTransition);
+        if (isValidUnifier && transition.variableStateCode != -1) {
+            StateCounter stateCounter = new StateCounter(transition.variableStateCode, counts);
+            List<Integer> variablePositions = stateCounter.currentValues();
+            StateTransition stateTransition = execute(recoverVariables(variablePositions));
+            return new Transition(code, transition.variableStateCode, stateTransition);
+        } else {
+            return new Transition(code, -1, new EmptyTransition());
+        }
     }
 
 

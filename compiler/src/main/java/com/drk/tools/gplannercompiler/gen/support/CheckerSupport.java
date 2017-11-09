@@ -1,4 +1,4 @@
-package com.drk.tools.gplannercompiler.gen.variables.support;
+package com.drk.tools.gplannercompiler.gen.support;
 
 import com.drk.tools.gplannercompiler.gen.GenException;
 
@@ -8,7 +8,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.Set;
 
-public class Checker {
+public class CheckerSupport {
 
 
     public static void assertIsPublic(Element element) throws GenException {
@@ -81,7 +81,7 @@ public class Checker {
         for (Element enclosed : typeElement.getEnclosedElements()) {
             if (enclosed.getKind() == ElementKind.CONSTRUCTOR) {
                 constructorCount++;
-                Checker.assertIsPublic(enclosed);
+                CheckerSupport.assertIsPublic(enclosed);
             }
         }
         if (constructorCount != count) {

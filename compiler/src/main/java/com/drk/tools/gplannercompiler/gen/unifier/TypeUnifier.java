@@ -78,6 +78,16 @@ class TypeUnifier {
 
     }
 
+    boolean containsSystemAction(){
+        return systemAction != null;
+    }
+
+    TypeName getSystemActionType() {
+        TypeElement typeElement = getTypeElement(systemAction);
+        return TypeName.get(typeElement.asType());
+
+    }
+
     private TypeElement getTypeElement(ExecutableElement element) {
         return (TypeElement) element.getEnclosingElement();
     }

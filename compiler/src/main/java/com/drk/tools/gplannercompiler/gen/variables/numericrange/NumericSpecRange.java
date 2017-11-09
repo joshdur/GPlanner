@@ -1,13 +1,14 @@
 package com.drk.tools.gplannercompiler.gen.variables.numericrange;
 
 import com.drk.tools.gplannercompiler.Logger;
+import com.drk.tools.gplannercompiler.gen.base.Spec;
 import com.drk.tools.gplannercore.annotations.core.Range;
 import com.drk.tools.gplannercore.core.variables.numeric.NumericVariableRange;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 
-class NumericSpecRange {
+class NumericSpecRange implements Spec {
 
     private final NumericTypeRange type;
     private final Logger logger;
@@ -17,11 +18,13 @@ class NumericSpecRange {
         this.logger = logger;
     }
 
-    String getPackage() {
+    @Override
+    public String getPackage() {
         return type.getPackage();
     }
 
-    TypeSpec getTypeSpec() {
+    @Override
+    public TypeSpec getTypeSpec() {
         return TypeSpec.classBuilder(type.getClassName())
                 .addAnnotation(getAnnotationSpec())
                 .addModifiers(Modifier.PUBLIC)

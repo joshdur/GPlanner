@@ -5,6 +5,7 @@ import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.variables.Variable;
 import com.drk.tools.gplannercore.core.variables.VariableRange;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Context {
@@ -19,6 +20,16 @@ public abstract class Context {
         this.variableMapper = new Mapper();
         this.mapper = new Mapper();
         this.isDebug = isDebug;
+    }
+
+    public List<BaseUnifier> getValidUnifiers(){
+        List<BaseUnifier> validUnifiers = new ArrayList<>();
+        for(BaseUnifier unifier : getUnifiers()){
+            if(unifier.hasNext()){
+                validUnifiers.add(unifier);
+            }
+        }
+        return validUnifiers;
     }
 
     public abstract List<BaseUnifier> getUnifiers();

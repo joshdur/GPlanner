@@ -2,6 +2,7 @@ package com.drk.tools.gplannercompiler.gen.context;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
+import com.drk.tools.gplannercompiler.gen.base.Spec;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.main.BaseUnifier;
 import com.squareup.javapoet.MethodSpec;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class SpecContext {
+class SpecContext implements Spec {
 
     private final static String DOMAIN_NAME = "%sContext";
 
@@ -25,11 +26,11 @@ class SpecContext {
         this.logger = logger;
     }
 
-    String getPackage() {
+    public String getPackage() {
         return typeContext.getPackage();
     }
 
-    TypeSpec getTypeSpec() throws GenException {
+    public TypeSpec getTypeSpec() throws GenException {
         logger.log(this, "- Building for " + typeContext.getClassName());
         TypeSpec.Builder builder = TypeSpec.classBuilder(String.format(DOMAIN_NAME, typeContext.getClassName()));
         builder.superclass(Context.class);
@@ -77,6 +78,7 @@ class SpecContext {
             if (rangeElement.isDynamic) {
                 builder.addMethod(MethodSpec.methodBuilder(rangeElement.variableName)
                         .returns(rangeElement.rangeTypeName)
+                        .addModifiers(Modifier.PUBLIC)
                         .addStatement("return ($T) injectRangeFromVariableClass($T.class)", rangeElement.rangeTypeName, rangeElement.variableTypeName)
                         .build())
                         .build();

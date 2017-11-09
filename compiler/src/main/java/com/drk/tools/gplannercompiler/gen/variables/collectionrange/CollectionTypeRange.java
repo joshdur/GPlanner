@@ -1,15 +1,12 @@
 package com.drk.tools.gplannercompiler.gen.variables.collectionrange;
 
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercompiler.gen.variables.support.Extractor;
-import com.drk.tools.gplannercore.annotations.variables.CollectionRange;
+import com.drk.tools.gplannercompiler.gen.support.Extractor;
 import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-import java.util.List;
 
 class CollectionTypeRange {
     private final static String CLASS_NAME = "%sRange";

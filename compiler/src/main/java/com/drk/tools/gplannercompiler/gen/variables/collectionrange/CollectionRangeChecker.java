@@ -2,8 +2,9 @@ package com.drk.tools.gplannercompiler.gen.variables.collectionrange;
 
 import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercompiler.gen.variables.support.Checker;
-import com.drk.tools.gplannercompiler.gen.variables.support.Extractor;
+import com.drk.tools.gplannercompiler.gen.base.Checker;
+import com.drk.tools.gplannercompiler.gen.support.CheckerSupport;
+import com.drk.tools.gplannercompiler.gen.support.Extractor;
 import com.drk.tools.gplannercore.core.variables.collection.CollectionVariable;
 
 import javax.lang.model.element.Element;
@@ -12,17 +13,20 @@ import javax.lang.model.util.Types;
 import java.util.List;
 import java.util.Set;
 
-class CollectionRangeChecker {
+public class CollectionRangeChecker implements Checker {
 
+    private final Set<? extends Element> collectionRanges;
     private final Logger logger;
     private final Types types;
 
-    CollectionRangeChecker(Logger logger, Types types) {
+    public CollectionRangeChecker(Set<? extends Element> collectionRanges, Logger logger, Types types) {
+        this.collectionRanges = collectionRanges;
         this.logger = logger;
         this.types = types;
     }
 
-    void check(Set<? extends Element> collectionRanges) throws GenException {
+    @Override
+    public void check() throws GenException {
         logger.log(this, "Checking collectionRanges");
         for (Element e : collectionRanges) {
             checkElement(e);
@@ -30,11 +34,11 @@ class CollectionRangeChecker {
     }
 
     private void checkElement(Element element) throws GenException {
-        Checker.assertIsPublic(element);
-        Checker.assertExtension(element, CollectionVariable.class, types);
-        Checker.assertPublicConstructorCount(element, 1);
-        Checker.assertConstructorVariableCount(element, 1);
+        CheckerSupport.assertIsPublic(element);
+        CheckerSupport.assertExtension(element, CollectionVariable.class, types);
+        CheckerSupport.assertPublicConstructorCount(element, 1);
+        CheckerSupport.assertConstructorVariableCount(element, 1);
         List<TypeMirror> parameters = Extractor.getParametersOfSuperclass(element);
-        Checker.assertConstructorVariableType(element, types, parameters.toArray());
+        CheckerSupport.assertConstructorVariableType(element, types, parameters.toArray());
     }
 }

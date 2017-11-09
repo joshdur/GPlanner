@@ -1,4 +1,4 @@
-package com.drk.tools.gplannercompiler.gen.variables.support;
+package com.drk.tools.gplannercompiler.gen.support;
 
 import com.drk.tools.gplannercompiler.gen.GenException;
 
@@ -17,7 +17,7 @@ public class Extractor {
     }
 
     public static List<TypeMirror> getParametersOfSuperclass(Element element) throws GenException {
-        Checker.assertIsClass(element);
+        CheckerSupport.assertIsClass(element);
         TypeElement typeElement = (TypeElement) element;
         DeclaredType declaredType = (DeclaredType) typeElement.getSuperclass();
         List<TypeMirror> parameters = new ArrayList<>();

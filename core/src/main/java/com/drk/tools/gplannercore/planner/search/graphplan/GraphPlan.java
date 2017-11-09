@@ -155,7 +155,7 @@ public class GraphPlan implements Searcher {
 
         @Override
         public int hashCode() {
-            return one.hashCode() * other.hashCode();
+            return 557 * (one.hashCode() + other.hashCode());
         }
 
         @Override

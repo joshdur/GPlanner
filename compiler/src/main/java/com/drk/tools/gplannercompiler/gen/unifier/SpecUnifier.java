@@ -1,6 +1,7 @@
 package com.drk.tools.gplannercompiler.gen.unifier;
 
 import com.drk.tools.gplannercompiler.Logger;
+import com.drk.tools.gplannercompiler.gen.base.Spec;
 import com.drk.tools.gplannercore.annotations.core.Unifier;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.main.BaseUnifier;
@@ -14,7 +15,7 @@ import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-class SpecUnifier {
+class SpecUnifier implements Spec{
 
     private final static String UNIFIER_NAME = "%s$$Unifier";
     private final static String VARIABLE_NAME = "v";
@@ -27,11 +28,13 @@ class SpecUnifier {
         this.logger = logger;
     }
 
-    String getPackage() {
+    @Override
+    public String getPackage() {
         return typeUnifier.getPackageName();
     }
 
-    TypeSpec getTypeSpec() {
+    @Override
+    public TypeSpec getTypeSpec() {
         logger.log(this, "- Building for " + typeUnifier.getClassName());
         return TypeSpec.classBuilder(String.format(UNIFIER_NAME, typeUnifier.getClassName()))
                 .superclass(BaseUnifier.class)
@@ -66,11 +69,12 @@ class SpecUnifier {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getVariables");
         builder.addAnnotation(Override.class);
         builder.addModifiers(Modifier.PROTECTED);
+        builder.addParameter(Context.class, "context");
         builder.returns(ParameterizedTypeName.get(List.class, VariableRange.class));
-        List<String> ranges = typeUnifier.getRanges();
+        List<TypeName> variables = typeUnifier.getVariables();
         builder.addStatement("$1T<$2T> variableRanges = new $3T<$2T>()", List.class, VariableRange.class, ArrayList.class);
-        for (String variableRange : ranges) {
-            builder.addStatement("variableRanges.add(new $L())", variableRange);
+        for (TypeName variable : variables) {
+            builder.addStatement("variableRanges.add(context.injectRangeFromVariableClass($T.class))", variable);
         }
         builder.addStatement("return variableRanges");
         return builder.build();
@@ -96,9 +100,13 @@ class SpecUnifier {
         builder.addParameter(ParameterizedTypeName.get(List.class, Variable.class), "variables");
         builder.returns(StateTransition.class);
         builder.addException(Throwable.class);
-        builder.addStatement("$1T $2L = operatorClass($1T.class)", typeUnifier.getOperatorsType(), "system");
-        builder.addStatement("if(system == null) return new $T()", EmptyTransition.class);
-        recoverAndCallMethodWithVariables(builder, "system");
+        if(!typeUnifier.containsSystemAction()) {
+            builder.addStatement("return new $T()", EmptyTransition.class);
+        } else {
+            builder.addStatement("$1T $2L = operatorClass($1T.class)", typeUnifier.getSystemActionType(), "system");
+            builder.addStatement("if(system == null) return new $T()", EmptyTransition.class);
+            recoverAndCallMethodWithVariables(builder, "system");
+        }
         return builder.build();
     }
 

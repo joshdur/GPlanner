@@ -1,7 +1,7 @@
 package com.drk.tools.gplannercompiler.gen.context;
 
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercompiler.gen.variables.support.Extractor;
+import com.drk.tools.gplannercompiler.gen.support.Extractor;
 import com.drk.tools.gplannercore.annotations.core.Range;
 import com.drk.tools.gplannercore.annotations.core.Unifier;
 import com.drk.tools.gplannercore.core.main.BaseOperators;
@@ -12,7 +12,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.*;
 
-import static com.drk.tools.gplannercompiler.gen.variables.support.Extractor.getVariableName;
+import static com.drk.tools.gplannercompiler.gen.support.Extractor.getVariableName;
 
 class TypeContext {
 

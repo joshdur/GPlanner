@@ -18,7 +18,7 @@ public class OperatorUnifierBuilder implements UnifierBuilder {
 
     @Override
     public SearchUnifier from(Set<Statement> positive, Set<Statement> negative) {
-        List<BaseUnifier> unifiers = context.getUnifiers();
+        List<BaseUnifier> unifiers = context.getValidUnifiers();
         Application application = new Application(positive, negative);
         return new OperatorUnifier(unifiers, application);
     }

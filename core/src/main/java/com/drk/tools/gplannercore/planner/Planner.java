@@ -3,10 +3,10 @@ package com.drk.tools.gplannercore.planner;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.search.Searcher;
+import com.drk.tools.gplannercore.core.search.context.SearchContext;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.streams.GOutputStream;
 import com.drk.tools.gplannercore.core.streams.PlanBuffer;
-import com.drk.tools.gplannercore.core.search.context.SearchContext;
 
 public class Planner {
 
@@ -27,7 +27,7 @@ public class Planner {
     }
 
     public PlanStream search(Context context, State initState, State finalState) {
-        PlanBuffer planBuffer = new PlanBuffer(bufferSize);
+        PlanBuffer planBuffer = new PlanBuffer();
         PlanStream planStream = new PlanStream(planBuffer.inputStream(), bufferSize);
         SearchContext searchContext = buildSearchContext(context, planBuffer.outputStream());
         SearchData searchData = new SearchData(searchContext, initState, finalState);

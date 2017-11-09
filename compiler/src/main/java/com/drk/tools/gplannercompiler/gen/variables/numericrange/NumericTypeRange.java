@@ -1,6 +1,6 @@
 package com.drk.tools.gplannercompiler.gen.variables.numericrange;
 
-import com.drk.tools.gplannercompiler.gen.variables.support.Extractor;
+import com.drk.tools.gplannercompiler.gen.support.Extractor;
 import com.drk.tools.gplannercore.annotations.variables.NumericRange;
 import com.squareup.javapoet.TypeName;
 

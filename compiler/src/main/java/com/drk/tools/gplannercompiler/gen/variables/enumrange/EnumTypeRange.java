@@ -1,8 +1,8 @@
 package com.drk.tools.gplannercompiler.gen.variables.enumrange;
 
 import com.drk.tools.gplannercompiler.gen.GenException;
-import com.drk.tools.gplannercompiler.gen.variables.support.Checker;
-import com.drk.tools.gplannercompiler.gen.variables.support.Extractor;
+import com.drk.tools.gplannercompiler.gen.support.CheckerSupport;
+import com.drk.tools.gplannercompiler.gen.support.Extractor;
 import com.drk.tools.gplannercore.annotations.variables.EnumRange;
 import com.squareup.javapoet.TypeName;
 
@@ -71,7 +71,7 @@ class EnumTypeRange {
 
     private void addEnumTypesFrom(TypeMirror typeMirror, List<EnumType> enumTypes) throws GenException {
         Element element = types.asElement(typeMirror);
-        Checker.assertIsEnum(element);
+        CheckerSupport.assertIsEnum(element);
         TypeElement typeElement = (TypeElement) element;
         for (Element enclosed : typeElement.getEnclosedElements()) {
             if (enclosed.getKind() == ElementKind.ENUM_CONSTANT) {

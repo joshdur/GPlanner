@@ -15,17 +15,17 @@ public class GStatement implements Statement {
     }
 
     public static <V extends Variable> GStatement from(Atom<V> atom, V variable) {
-        int hashCode = 31 * atom.getClass().hashCode() + variable.hashCode();
+        int hashCode = 31 * atom.getClass().getCanonicalName().hashCode() + variable.hashCode();
         return new GStatement(hashCode);
     }
 
     public static <V1 extends Variable, V2 extends Variable> GStatement from(BinaryAtom<V1, V2> atom, V1 v1, V2 v2){
-        int hashCode = 47 * atom.getClass().hashCode() + v1.hashCode() + v2.hashCode();
+        int hashCode = 47 * atom.getClass().getCanonicalName().hashCode() + v1.hashCode() + v2.hashCode();
         return new GStatement(hashCode);
     }
 
     public static <V1 extends Variable, V2 extends Variable, V3 extends Variable> GStatement from(TernaryAtom<V1, V2, V3> atom, V1 v1, V2 v2, V3 v3){
-        int hashCode = 67 * atom.getClass().hashCode() + v1.hashCode() + v2.hashCode() + v3.hashCode();
+        int hashCode = 67 * atom.getClass().getCanonicalName().hashCode() + v1.hashCode() + v2.hashCode() + v3.hashCode();
         return new GStatement(hashCode);
     }
 

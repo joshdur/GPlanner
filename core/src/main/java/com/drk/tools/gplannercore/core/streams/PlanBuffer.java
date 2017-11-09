@@ -2,17 +2,18 @@ package com.drk.tools.gplannercore.core.streams;
 
 import com.drk.tools.gplannercore.core.Plan;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class PlanBuffer {
 
+    private final static Item FINAL_ITEM = new Item(null);
     private final BlockingQueue<Item> queue;
     private boolean isClosed;
 
-    public PlanBuffer(int bufferSize) {
-        this.queue = new ArrayBlockingQueue<>(bufferSize);
+    public PlanBuffer() {
+        this.queue = new LinkedBlockingQueue<>();
         this.isClosed = false;
     }
 
@@ -29,17 +30,7 @@ public class PlanBuffer {
             return;
         }
         isClosed = true;
-        //Unblock producer
-        if (isFull()) {
-            queue.poll();
-        }
-        //Unblock consumer
-        queue.offer(new Item(null));
-
-    }
-
-    private boolean isFull() {
-        return queue.remainingCapacity() == 0;
+        queue.offer(FINAL_ITEM);
     }
 
     private class InputStream implements GInputStream {
@@ -86,7 +77,7 @@ public class PlanBuffer {
         }
 
         @Override
-        public void close() throws GStreamException {
+        public synchronized void close() throws GStreamException {
             internalClose();
         }
 
