@@ -1,5 +1,7 @@
 package com.drk.tools.gplannercore.core.state;
 
+import java.util.Set;
+
 public class Transition {
 
     private final static int NOOP_CODE = -7;
@@ -26,9 +28,18 @@ public class Transition {
     @Override
     public int hashCode() {
         return stateTransition.hashCode();
+
     }
 
     public boolean isNoop() {
         return unifierCode == NOOP_CODE;
+    }
+
+    public Set<Statement> getPreconditions(){
+        return stateTransition.getPreconditions();
+    }
+
+    public Set<Statement> getEffects(){
+        return stateTransition.getEffects();
     }
 }

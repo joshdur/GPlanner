@@ -1,34 +1,51 @@
 package com.drk.tools.gplannercore.core.state;
 
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
-public interface StateTransition {
+public abstract class StateTransition {
 
-    Set<Statement> getPositivePreconditions();
+    private final Set<Statement> preconditions = new HashSet<>();
+    private final Set<Statement> effects = new HashSet<>();
 
-    Set<Statement> getNegativePreconditions();
+    public Set<Statement> getPreconditions() {
+        return preconditions;
+    }
 
-    Set<Statement> getPositiveEffects();
+    public Set<Statement> getEffects() {
+        return effects;
+    }
 
-    Set<Statement> getNegativeEffects();
+    public void check(Statement sStatement) {
+        preconditions.add(sStatement);
+    }
 
-    StateTransition check(Statement sStatement);
+    public void checkAll(Set<Statement> sStatements) {
+        for (Statement statement : sStatements) {
+            check(statement);
+        }
+    }
 
-    StateTransition checkAll(Collection<Statement> sStatements);
+    public void apply(Statement statement) {
+        effects.remove(statement.not());
+        effects.add(statement);
+    }
 
-    StateTransition set(Statement sStatement);
-
-    StateTransition setAll(Collection<Statement> sStatements);
-
-    StateTransition not(Statement sStatement);
-
-    StateTransition notAll(Collection<Statement> sStatements);
+    public void applyAll(Set<Statement> sStatements) {
+        for (Statement statement : sStatements) {
+            apply(statement);
+        }
+    }
 
     @Override
-    boolean equals(Object object);
+    public boolean equals(Object obj) {
+        return obj instanceof StateTransition && hashCode() == obj.hashCode();
+    }
 
     @Override
-    int hashCode();
-
+    public int hashCode() {
+        int hashCode1 = preconditions.hashCode();
+        int hashCode2 = effects.hashCode();
+        return (7 * hashCode1) + (17 * hashCode2);
+    }
 }

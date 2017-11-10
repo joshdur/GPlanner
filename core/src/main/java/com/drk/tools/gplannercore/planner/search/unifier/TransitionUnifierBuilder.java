@@ -1,11 +1,10 @@
 package com.drk.tools.gplannercore.planner.search.unifier;
 
-import com.drk.tools.gplannercore.core.state.Statement;
+import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Transition;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class TransitionUnifierBuilder implements UnifierBuilder {
 
@@ -16,8 +15,8 @@ public class TransitionUnifierBuilder implements UnifierBuilder {
     }
 
     @Override
-    public SearchUnifier from(Set<Statement> positive, Set<Statement> negative) {
-        Application application = new Application(positive, negative);
+    public SearchUnifier from(State state) {
+        Application application = new Application(state);
         return new TransitionUnifier(new ArrayList<>(transitions), application);
     }
 

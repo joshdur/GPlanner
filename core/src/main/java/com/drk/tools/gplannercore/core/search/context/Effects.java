@@ -3,8 +3,6 @@ package com.drk.tools.gplannercore.core.search.context;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.state.State;
-import com.drk.tools.gplannercore.core.state.StateTransition;
-import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
 
 class Effects {
@@ -20,27 +18,19 @@ class Effects {
     State applyEffects(State state, Transition transition) throws SearchException {
         State newState = state.clone();
         if (online) {
-            applySystemEffects(state, transition);
+            applySystemEffects(newState, transition);
         }
-        applyStateEffects(newState, transition.stateTransition);
+        newState.applyAll(transition.getEffects());
         return newState;
     }
 
     private void applySystemEffects(State state, Transition transition) throws SearchException {
         try {
             Transition eventTransition = context.execute(transition);
-            applyStateEffects(state, eventTransition.stateTransition);
+            state.applyAll(eventTransition.getEffects());
         } catch (Throwable e) {
             throw new SearchException(e);
         }
     }
 
-    private void applyStateEffects(State state, StateTransition stateTransition) {
-        for (Statement negative : stateTransition.getNegativeEffects()) {
-            state.remove(negative);
-        }
-        for (Statement positive : stateTransition.getPositiveEffects()) {
-            state.set(positive);
-        }
-    }
 }

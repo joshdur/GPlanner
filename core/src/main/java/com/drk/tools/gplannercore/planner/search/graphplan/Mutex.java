@@ -27,6 +27,12 @@ class Mutex {
                 }
             }
         }
+        for(Statement one : statements){
+            if(statements.contains(one.not())){
+                stExclusions.add(new GraphPlan.Rel(one, one.not()));
+            }
+        }
+
         return stExclusions;
     }
 
@@ -44,7 +50,7 @@ class Mutex {
     private static Set<Transition> transitionsWithEffect(Set<Transition> transitions, Statement effect) {
         Set<Transition> withEffect = new HashSet<>();
         for (Transition transition : transitions) {
-            if (transition.stateTransition.getPositiveEffects().contains(effect)) {
+            if (transition.getEffects().contains(effect)) {
                 withEffect.add(transition);
             }
         }
@@ -54,8 +60,8 @@ class Mutex {
     private static boolean existsTransitionForTwo(Statement one, Statement other, Set<Transition> transitions) {
         for (Transition transition : transitions) {
             StateTransition stateTransition = transition.stateTransition;
-            Set<Statement> positive = stateTransition.getPositiveEffects();
-            if (positive.contains(one) && positive.contains(other)) {
+            Set<Statement> effects = stateTransition.getEffects();
+            if (effects.contains(one) && effects.contains(other)) {
                 return true;
             }
         }
@@ -89,10 +95,23 @@ class Mutex {
 
     private static boolean checkIndependence(Transition one, Transition toOther) {
         Set<Statement> join = new HashSet<>();
-        join.addAll(toOther.stateTransition.getPositivePreconditions());
-        join.addAll(toOther.stateTransition.getPositiveEffects());
-        boolean independent = !containsAny(join, one.stateTransition.getNegativeEffects());
-        return independent && !containsAny(one.stateTransition.getNegativeEffects(), join);
+        join.addAll(filter(toOther.getPreconditions(), false));
+        join.addAll(filter(toOther.getEffects(),false));
+        Set<Statement> negativeEffects = filter(one.getEffects(), true);
+        boolean independent = !containsAny(join, negativeEffects);
+        return independent && !containsAny(negativeEffects, join);
+    }
+
+    private static Set<Statement> filter(Set<Statement> statements, boolean isNegated) {
+        Set<Statement> newSet = new HashSet<>();
+        for (Statement statement : statements) {
+            if(isNegated && statement.isNegated()){
+                newSet.add(statement);
+            }else if(!isNegated && !statement.isNegated()){
+                newSet.add(statement);
+            }
+        }
+        return newSet;
     }
 
     private static boolean containsAny(Set<Statement> dest, Set<Statement> source) {
@@ -105,8 +124,8 @@ class Mutex {
     }
 
     private static boolean checkEmptyMutexPreconditions(Transition one, Transition other, Set<GraphPlan.Rel> stExclusion) {
-        Set<Statement> onePreconds = one.stateTransition.getPositivePreconditions();
-        Set<Statement> otherPreconds = other.stateTransition.getPositivePreconditions();
+        Set<Statement> onePreconds = one.stateTransition.getPreconditions();
+        Set<Statement> otherPreconds = other.stateTransition.getPreconditions();
         for (Statement oneSt : onePreconds) {
             for (Statement otherSt : otherPreconds) {
                 if (stExclusion.contains(new GraphPlan.Rel(oneSt, otherSt))) {

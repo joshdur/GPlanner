@@ -3,14 +3,14 @@ package com.drk.tools.gplannercore.planner.search.graphplan;
 import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.search.Searcher;
+import com.drk.tools.gplannercore.core.search.context.SearchContext;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
-import com.drk.tools.gplannercore.core.search.context.SearchContext;
-import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
+import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
-import com.drk.tools.gplannercore.planner.search.unifier.UnifierBuilder;
+import com.drk.tools.gplannercore.planner.state.GState;
 import com.drk.tools.gplannercore.planner.state.GStateTransition;
 
 import java.util.ArrayList;
@@ -52,10 +52,8 @@ public class GraphPlan implements Searcher {
         }
     }
 
-
     private Layer firstLayer(State initialState, Context context) {
-        UnifierBuilder unifierBuilder = new OperatorUnifierBuilder(context);
-        SearchUnifier searchUnifier = unifierBuilder.from(initialState.getStatements(), new HashSet<Statement>());
+        SearchUnifier searchUnifier = OperatorUnifier.from(context, initialState);
         Set<Rel> statementExclusions = new HashSet<>();
         Set<Statement> statements = new HashSet<>(initialState.getStatements());
         Set<Transition> transitions = new HashSet<>(searchUnifier.all());
@@ -75,13 +73,12 @@ public class GraphPlan implements Searcher {
 
     private Transition noopTransition(Context context, Set<Statement> statements) {
         StateTransition stateTransition = new GStateTransition(context);
-        stateTransition.setAll(statements);
+        stateTransition.applyAll(statements);
         return Transition.noop(stateTransition);
     }
 
     private Set<Transition> getApplicableTransitions(Set<Rel> statementExcludions, Context context, Set<Statement> statements) {
-        UnifierBuilder unifierBuilder = new OperatorUnifierBuilder(context);
-        SearchUnifier searchUnifier = unifierBuilder.from(statements, new HashSet<Statement>());
+        SearchUnifier searchUnifier = OperatorUnifier.from(context, new GState(statements));
         Set<Transition> transitions = new HashSet<>();
         for (Transition transition : searchUnifier.all()) {
             if (!hasMutexPreconditions(transition, statementExcludions)) {
@@ -92,7 +89,7 @@ public class GraphPlan implements Searcher {
     }
 
     private boolean hasMutexPreconditions(Transition transition, Set<Rel> statementExclusions) {
-        Set<Statement> preconds = transition.stateTransition.getPositivePreconditions();
+        Set<Statement> preconds = transition.getPreconditions();
         for (Statement precond : preconds) {
             for (Statement otherPrecond : preconds) {
                 if (!precond.equals(otherPrecond)) {
@@ -109,7 +106,7 @@ public class GraphPlan implements Searcher {
     private Set<Statement> transitionEffects(Set<Transition> transitions) {
         Set<Statement> statements = new HashSet<>();
         for (Transition transition : transitions) {
-            statements.addAll(transition.stateTransition.getPositiveEffects());
+            statements.addAll(transition.getEffects());
         }
         return statements;
     }

@@ -19,25 +19,42 @@ public class GState implements State {
     }
 
     @Override
-    public State remove(Statement statement) {
-        statements.remove(statement);
+    public State apply(Statement statement) {
+        if (statement.isNegated()) {
+            statements.remove(statement.not());
+        } else {
+            statements.add(statement);
+        }
         return this;
     }
 
     @Override
-    public State set(Statement statement) {
-        statements.add(statement);
+    public State applyAll(Set<Statement> statements) {
+        for (Statement statement : statements) {
+            apply(statement);
+        }
         return this;
     }
 
     @Override
     public boolean check(Statement statement) {
-        return statements.contains(statement);
+        boolean not = statement.isNegated();
+        boolean isContained = statements.contains(statement);
+        if (not) {
+            return !isContained;
+        } else {
+            return isContained;
+        }
     }
 
     @Override
-    public boolean checkNot(Statement statement) {
-        return !statements.contains(statement);
+    public boolean checkAll(Set<Statement> statements) {
+        for (Statement statement : statements) {
+            if (!check(statement)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -61,7 +78,7 @@ public class GState implements State {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return statements.hashCode();
     }
 }

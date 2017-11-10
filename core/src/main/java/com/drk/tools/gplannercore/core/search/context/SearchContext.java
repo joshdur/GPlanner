@@ -4,7 +4,6 @@ import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.Plan;
 import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.state.State;
-import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.streams.GOutputStream;
 import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
@@ -14,7 +13,6 @@ import com.drk.tools.gplannercore.planner.search.unifier.UnifierBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 public class SearchContext {
@@ -89,7 +87,7 @@ public class SearchContext {
     }
 
     public SearchUnifier getUnifier(State state) {
-        return unifierBuilder.from(state.getStatements(), new HashSet<Statement>());
+        return unifierBuilder.from(state);
     }
 
     public Context getContext() {
@@ -111,7 +109,7 @@ public class SearchContext {
             this.unifierBuilder = new OperatorUnifierBuilder(context);
         }
 
-        public Builder(SearchContext searchContext){
+        public Builder(SearchContext searchContext) {
             this.context = searchContext.context;
             this.safeStream = searchContext.safeStream;
             this.searchTimer = searchContext.searchTimer;
@@ -119,7 +117,7 @@ public class SearchContext {
             this.unifierBuilder = searchContext.unifierBuilder;
         }
 
-        public Builder timeout(long timeout){
+        public Builder timeout(long timeout) {
             searchTimer = new SearchTimer(timeout);
             return this;
         }
@@ -129,12 +127,12 @@ public class SearchContext {
             return this;
         }
 
-        public Builder transitions(List<Transition> transitions){
+        public Builder transitions(List<Transition> transitions) {
             unifierBuilder = new TransitionUnifierBuilder(transitions);
             return this;
         }
 
-        public SearchContext build(){
+        public SearchContext build() {
             return new SearchContext(this);
         }
     }

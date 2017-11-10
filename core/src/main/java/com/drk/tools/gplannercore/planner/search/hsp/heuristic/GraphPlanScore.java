@@ -4,9 +4,9 @@ import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
-import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
+import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
-import com.drk.tools.gplannercore.planner.search.unifier.UnifierBuilder;
+import com.drk.tools.gplannercore.planner.state.GState;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,8 +35,7 @@ public class GraphPlanScore implements Score {
     }
 
     private Layer firstLayer(State initialState, Context context) {
-        UnifierBuilder unifierBuilder = new OperatorUnifierBuilder(context);
-        SearchUnifier searchUnifier = unifierBuilder.from(initialState.getStatements(), new HashSet<Statement>());
+        SearchUnifier searchUnifier = OperatorUnifier.from(context, initialState);
         Set<Statement> statements = new HashSet<>(initialState.getStatements());
         Set<Transition> transitions = new HashSet<>(searchUnifier.all());
         return new Layer(null, statements, transitions);
@@ -45,8 +44,7 @@ public class GraphPlanScore implements Score {
     private Layer expandLayer(Layer layer, Context context) {
         Set<Statement> statements = new HashSet<>(layer.statements);
         statements.addAll(transitionEffects(layer.applicableTransitions));
-        UnifierBuilder unifierBuilder = new OperatorUnifierBuilder(context);
-        SearchUnifier searchUnifier = unifierBuilder.from(statements, new HashSet<Statement>());
+        SearchUnifier searchUnifier = OperatorUnifier.from(context, new GState(statements));
         Set<Transition> transitions = new HashSet<>(searchUnifier.all());
         return new Layer(layer, statements, transitions);
     }
@@ -54,11 +52,20 @@ public class GraphPlanScore implements Score {
     private Set<Statement> transitionEffects(Set<Transition> transitions) {
         Set<Statement> statements = new HashSet<>();
         for (Transition transition : transitions) {
-            statements.addAll(transition.stateTransition.getPositiveEffects());
+            statements.addAll(positive(transition.getEffects()));
         }
         return statements;
     }
 
+    private Set<Statement> positive(Set<Statement> statements) {
+        Set<Statement> newSet = new HashSet<>();
+        for (Statement statement : statements) {
+            if (!statement.isNegated()) {
+                newSet.add(statement);
+            }
+        }
+        return newSet;
+    }
 
     private static class Layer {
 

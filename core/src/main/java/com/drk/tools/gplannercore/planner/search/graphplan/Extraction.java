@@ -25,7 +25,7 @@ class Extraction {
     private static Set<Statement> allPreconds(Set<Transition> transitions){
         Set<Statement> preconds = new HashSet<>();
         for(Transition transition : transitions){
-            preconds.addAll(transition.stateTransition.getPositivePreconditions());
+            preconds.addAll(transition.getPreconditions());
         }
         return preconds;
     }
@@ -34,7 +34,7 @@ class Extraction {
         Set<Transition> relevant = new HashSet<>();
         for(Statement statement : preconds){
             for(Transition transition : layer.applicableTransitions){
-                if(transition.stateTransition.getPositiveEffects().contains(statement)){
+                if(transition.getEffects().contains(statement)){
                     relevant.add(transition);
                 }
             }

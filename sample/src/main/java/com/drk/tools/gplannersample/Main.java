@@ -18,9 +18,12 @@ import static com.drk.tools.gplannersample.Monkey.*;
 
 public class Main {
 
+    private static boolean debug = true;
+
     public static void main(String[] args) throws Throwable {
-        Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
-        DefaultContext monkeyContext = new DefaultContext();
+        //Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
+        Planner planner = new Planner(new SimpleForward(), 10);
+        DefaultContext monkeyContext = new DefaultContext(debug);
         PlanStream planStream = planner.search(monkeyContext, initialState(), finalState());
         List<Plan> plans = planStream.read();
         while (!plans.isEmpty()) {
@@ -40,7 +43,7 @@ public class Main {
 
 
     private static State initialState() {
-        GStateBuilder stateBuilder = new GStateBuilder();
+        GStateBuilder stateBuilder = new GStateBuilder(debug);
         stateBuilder.set(at, LocationRange.A);
         stateBuilder.set(boxAt, LocationRange.C);
         stateBuilder.set(bananasAt, LocationRange.B);
@@ -49,7 +52,7 @@ public class Main {
     }
 
     private static State finalState() {
-        GStateBuilder stateBuilder = new GStateBuilder();
+        GStateBuilder stateBuilder = new GStateBuilder(debug);
         stateBuilder.set(have, ThingRange.BANANAS);
         return stateBuilder.build();
     }

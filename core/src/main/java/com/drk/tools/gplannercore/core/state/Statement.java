@@ -8,4 +8,8 @@ public interface Statement {
     @Override
     int hashCode();
 
+    Statement not();
+
+    boolean isNegated();
+
 }

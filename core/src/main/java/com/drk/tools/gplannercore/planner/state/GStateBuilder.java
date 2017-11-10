@@ -20,17 +20,17 @@ public class GStateBuilder {
     }
 
     public <V extends Variable> GStateBuilder set(Atom<V> a, V v) {
-        state.set(StatementBuilder.build(debug, a, v));
+        state.apply(StatementBuilder.build(debug, a, v));
         return this;
     }
 
     public <V1 extends Variable, V2 extends Variable> GStateBuilder from(BinaryAtom<V1, V2> a, V1 v1, V2 v2) {
-        state.set(StatementBuilder.build(debug, a, v1, v2));
+        state.apply(StatementBuilder.build(debug, a, v1, v2));
         return this;
     }
 
     public <V1 extends Variable, V2 extends Variable, V3 extends Variable> GStateBuilder from(TernaryAtom<V1, V2, V3> a, V1 v1, V2 v2, V3 v3) {
-        state.set(StatementBuilder.build(debug, a, v1, v2, v3));
+        state.apply(StatementBuilder.build(debug, a, v1, v2, v3));
         return this;
     }
 
