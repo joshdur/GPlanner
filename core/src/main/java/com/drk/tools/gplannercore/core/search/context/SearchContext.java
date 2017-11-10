@@ -4,6 +4,7 @@ import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.Plan;
 import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.state.State;
+import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.streams.GOutputStream;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
@@ -58,7 +59,7 @@ public class SearchContext {
     }
 
     public boolean validate(State newState, State finalState) {
-        return newState.getStatements().containsAll(finalState.getStatements());
+        return newState.checkAll(finalState.getStatements());
     }
 
     public boolean existsInSequence(State newState, SearchNode node) {

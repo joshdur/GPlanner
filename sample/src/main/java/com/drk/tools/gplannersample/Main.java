@@ -21,8 +21,8 @@ public class Main {
     private static boolean debug = true;
 
     public static void main(String[] args) throws Throwable {
-        Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
-        //Planner planner = new Planner(new SimpleForward(), 10);
+        //Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
+        Planner planner = new Planner(new SimpleForward(), 10);
         DefaultContext monkeyContext = new DefaultContext(debug);
         PlanStream planStream = planner.search(monkeyContext, initialState(), finalState());
         List<Plan> plans = planStream.read();
@@ -48,13 +48,13 @@ public class Main {
         stateBuilder.set(boxAt, LocationRange.C);
         stateBuilder.set(bananasAt, LocationRange.B);
         stateBuilder.set(level, LevelStateRange.LOW);
-        stateBuilder.set(test);
         return stateBuilder.build();
     }
 
     private static State finalState() {
         GStateBuilder stateBuilder = new GStateBuilder(debug);
         stateBuilder.set(have, ThingRange.BANANAS);
+        stateBuilder.not(test);
         return stateBuilder.build();
     }
 }

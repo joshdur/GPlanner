@@ -20,11 +20,8 @@ public class GState implements State {
 
     @Override
     public State apply(Statement statement) {
-        if (statement.isNegated()) {
-            statements.remove(statement.not());
-        } else {
-            statements.add(statement);
-        }
+        statements.remove(statement.not());
+        statements.add(statement);
         return this;
     }
 
@@ -39,7 +36,7 @@ public class GState implements State {
     @Override
     public boolean check(Statement statement) {
         boolean isContained = statements.contains(statement);
-        return (statement.isNegated() && !isContained) || (!statement.isNegated() && isContained);
+        return isContained || statement.isNegated();
     }
 
     @Override
