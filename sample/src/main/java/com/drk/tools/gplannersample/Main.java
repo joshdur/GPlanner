@@ -48,6 +48,7 @@ public class Main {
         stateBuilder.set(boxAt, LocationRange.C);
         stateBuilder.set(bananasAt, LocationRange.B);
         stateBuilder.set(level, LevelStateRange.LOW);
+        stateBuilder.set(test);
         return stateBuilder.build();
     }
 

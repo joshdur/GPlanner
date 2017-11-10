@@ -7,10 +7,9 @@ import com.drk.tools.gplannercore.core.variables.Variable;
 import com.drk.tools.gplannercore.planner.state.atoms.Atom;
 import com.drk.tools.gplannercore.planner.state.atoms.BinaryAtom;
 import com.drk.tools.gplannercore.planner.state.atoms.TernaryAtom;
+import com.drk.tools.gplannercore.planner.state.atoms.single.None;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public class GStateTransition extends StateTransition {
 
@@ -18,6 +17,10 @@ public class GStateTransition extends StateTransition {
 
     public GStateTransition(Context context) {
         this.context = context;
+    }
+
+    public GStateTransition check(Atom<None> atom) {
+        return check(atom, None.NONE);
     }
 
     public <V extends Variable> GStateTransition check(Atom<V> a, V v) {
@@ -35,6 +38,10 @@ public class GStateTransition extends StateTransition {
         return this;
     }
 
+    public GStateTransition checkNot(Atom<None> atom) {
+        return checkNot(atom, None.NONE);
+    }
+
     public <V extends Variable> GStateTransition checkNot(Atom<V> a, V v) {
         check(StatementBuilder.build(context.isDebug(), a, v).not());
         return this;
@@ -48,6 +55,10 @@ public class GStateTransition extends StateTransition {
     public <V1 extends Variable, V2 extends Variable, V3 extends Variable> GStateTransition checkNot(TernaryAtom<V1, V2, V3> a, V1 v1, V2 v2, V3 v3) {
         check(StatementBuilder.build(context.isDebug(), a, v1, v2, v3).not());
         return this;
+    }
+
+    public GStateTransition set(Atom<None> atom) {
+        return set(atom, None.NONE);
     }
 
     public <V extends Variable> GStateTransition set(Atom<V> a, V v) {
@@ -80,13 +91,17 @@ public class GStateTransition extends StateTransition {
         return notAll(StatementBuilder.buildOthers(context, a, v1, v2, v3));
     }
 
+    public GStateTransition not(Atom<None> atom) {
+        return not(atom, None.NONE);
+    }
+
     public <V extends Variable> GStateTransition not(Atom<V> a, V v) {
         apply(StatementBuilder.build(context.isDebug(), a, v).not());
         return this;
     }
 
     public <V1 extends Variable, V2 extends Variable> GStateTransition not(BinaryAtom<V1, V2> a, V1 v1, V2 v2) {
-         apply(StatementBuilder.build(context.isDebug(), a, v1, v2).not());
+        apply(StatementBuilder.build(context.isDebug(), a, v1, v2).not());
         return this;
     }
 
@@ -96,7 +111,7 @@ public class GStateTransition extends StateTransition {
     }
 
     public GStateTransition notAll(Collection<Statement> statements) {
-        for(Statement statement: statements){
+        for (Statement statement : statements) {
             apply(statement.not());
         }
         return this;

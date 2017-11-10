@@ -4,6 +4,7 @@ import com.drk.tools.gplannercore.core.variables.Variable;
 import com.drk.tools.gplannercore.planner.state.atoms.Atom;
 import com.drk.tools.gplannercore.planner.state.atoms.BinaryAtom;
 import com.drk.tools.gplannercore.planner.state.atoms.TernaryAtom;
+import com.drk.tools.gplannercore.planner.state.atoms.single.None;
 
 public class GStateBuilder {
 
@@ -17,6 +18,10 @@ public class GStateBuilder {
     public GStateBuilder(boolean debug) {
         this.state = new GState();
         this.debug = debug;
+    }
+
+    public GStateBuilder set(Atom<None> atom){
+        return set(atom, None.NONE);
     }
 
     public <V extends Variable> GStateBuilder set(Atom<V> a, V v) {

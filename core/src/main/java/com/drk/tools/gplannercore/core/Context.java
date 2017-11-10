@@ -4,6 +4,7 @@ import com.drk.tools.gplannercore.core.main.BaseUnifier;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.variables.Variable;
 import com.drk.tools.gplannercore.core.variables.VariableRange;
+import com.drk.tools.gplannercore.planner.state.atoms.single.None;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public abstract class Context {
     public Context(boolean isDebug) {
         this.operatorMapper = new Mapper();
         this.variableMapper = new Mapper();
+        this.variableMapper.set(None.class, new None.Range());
         this.mapper = new Mapper();
         this.isDebug = isDebug;
     }

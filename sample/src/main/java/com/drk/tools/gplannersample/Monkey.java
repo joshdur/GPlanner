@@ -6,6 +6,8 @@ import com.drk.tools.gplannercore.planner.state.atoms.Atom;
 import com.drk.tools.gplannercore.core.main.BaseOperators;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.planner.state.GStateTransition;
+import com.drk.tools.gplannercore.planner.state.atoms.single.None;
+import com.drk.tools.gplannercore.planner.state.atoms.single.SingleAtom;
 import com.drk.tools.gplannersample.vars.*;
 
 public class Monkey extends BaseOperators {
@@ -15,6 +17,7 @@ public class Monkey extends BaseOperators {
     public static BananasAt bananasAt = new BananasAt();
     public static Have have = new Have();
     public static Level level = new Level();
+    public static Test test = new Test();
 
     public Monkey(Context context) {
         super(context);
@@ -24,7 +27,7 @@ public class Monkey extends BaseOperators {
     @Operator
     StateTransition climbDown(Location x) {
         return new GStateTransition(context)
-                .check(at, x).check(boxAt, x)
+                .check(at, x).check(boxAt, x).check(test)
                 .check(level, LevelStateRange.HIGH)
                 .setAs(level, LevelStateRange.LOW);
     }
@@ -61,6 +64,8 @@ public class Monkey extends BaseOperators {
                 .setAs(have, ThingRange.BANANAS);
     }
 
+    public static class Test implements SingleAtom{
+    }
 
     public static class At implements Atom<Location> {
     }
