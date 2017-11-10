@@ -3,6 +3,7 @@ package com.drk.tools.gplannercore.planner.search.graphplan;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
+import com.drk.tools.gplannercore.planner.state.GState;
 
 import java.util.*;
 
@@ -44,7 +45,8 @@ class Extraction {
 
     static boolean reachedGoal(GraphPlan.Layer layer, State finalState) {
         Set<Statement> goalStatements = finalState.getStatements();
-        if (!layer.statements.containsAll(goalStatements)) {
+        GState currentState = new GState(layer.statements);
+        if (!currentState.checkAll(goalStatements)) {
             return false;
         }
         Set<GraphPlan.Rel> stExclusion = layer.statementExclusions;
