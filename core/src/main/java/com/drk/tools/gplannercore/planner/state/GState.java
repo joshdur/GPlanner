@@ -38,13 +38,8 @@ public class GState implements State {
 
     @Override
     public boolean check(Statement statement) {
-        boolean not = statement.isNegated();
         boolean isContained = statements.contains(statement);
-        if (not) {
-            return !isContained;
-        } else {
-            return isContained;
-        }
+        return (statement.isNegated() && !isContained) || (!statement.isNegated() && isContained);
     }
 
     @Override

@@ -21,8 +21,8 @@ public class Main {
     private static boolean debug = true;
 
     public static void main(String[] args) throws Throwable {
-        //Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
-        Planner planner = new Planner(new SimpleForward(), 10);
+        Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
+        //Planner planner = new Planner(new SimpleForward(), 10);
         DefaultContext monkeyContext = new DefaultContext(debug);
         PlanStream planStream = planner.search(monkeyContext, initialState(), finalState());
         List<Plan> plans = planStream.read();

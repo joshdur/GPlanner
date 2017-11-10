@@ -6,10 +6,10 @@ import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.streams.GOutputStream;
-import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifierBuilder;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
-import com.drk.tools.gplannercore.planner.search.unifier.TransitionUnifierBuilder;
-import com.drk.tools.gplannercore.planner.search.unifier.UnifierBuilder;
+import com.drk.tools.gplannercore.planner.search.unifier.providers.ContextIteratorProvider;
+import com.drk.tools.gplannercore.planner.search.unifier.providers.IteratorProvider;
+import com.drk.tools.gplannercore.planner.search.unifier.providers.StackIteratorProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,14 +21,14 @@ public class SearchContext {
     private final SearchTimer searchTimer;
     private final Effects effects;
     private final SafeStream safeStream;
-    private final UnifierBuilder unifierBuilder;
+    private final IteratorProvider iteratorProvider;
 
     private SearchContext(Builder builder) {
         this.context = builder.context;
         this.searchTimer = builder.searchTimer;
         this.effects = builder.effects;
         this.safeStream = builder.safeStream;
-        this.unifierBuilder = builder.unifierBuilder;
+        this.iteratorProvider = builder.iteratorProvider;
     }
 
     public long remainingTime() {
@@ -63,14 +63,12 @@ public class SearchContext {
 
     public boolean existsInSequence(State newState, SearchNode node) {
         SearchNode currentNode = node;
-        while (currentNode != null) {
-            if (currentNode.getState().equals(newState)) {
-                return true;
-            } else {
-                currentNode = currentNode.getLastNode();
-            }
+        boolean exists = false;
+        while (currentNode != null && !exists) {
+            exists = currentNode.getState().equals(newState);
+            currentNode = currentNode.getLastNode();
         }
-        return false;
+        return exists;
     }
 
     public Plan recoverSequence(SearchNode theNode) {
@@ -87,7 +85,7 @@ public class SearchContext {
     }
 
     public SearchUnifier getUnifier(State state) {
-        return unifierBuilder.from(state);
+        return new SearchUnifier(state, iteratorProvider.getIterator());
     }
 
     public Context getContext() {
@@ -99,14 +97,14 @@ public class SearchContext {
         private final SafeStream safeStream;
         private SearchTimer searchTimer;
         private Effects effects;
-        private UnifierBuilder unifierBuilder;
+        private IteratorProvider iteratorProvider;
 
         public Builder(Context context, GOutputStream outputStream) {
             this.context = context;
             this.safeStream = new SafeStream(outputStream);
             this.searchTimer = new SearchTimer(Long.MAX_VALUE);
             this.effects = new Effects(context, false);
-            this.unifierBuilder = new OperatorUnifierBuilder(context);
+            this.iteratorProvider = new ContextIteratorProvider(context);
         }
 
         public Builder(SearchContext searchContext) {
@@ -114,7 +112,7 @@ public class SearchContext {
             this.safeStream = searchContext.safeStream;
             this.searchTimer = searchContext.searchTimer;
             this.effects = searchContext.effects;
-            this.unifierBuilder = searchContext.unifierBuilder;
+            this.iteratorProvider = searchContext.iteratorProvider;
         }
 
         public Builder timeout(long timeout) {
@@ -128,7 +126,7 @@ public class SearchContext {
         }
 
         public Builder transitions(List<Transition> transitions) {
-            unifierBuilder = new TransitionUnifierBuilder(transitions);
+            iteratorProvider = new StackIteratorProvider(transitions);
             return this;
         }
 

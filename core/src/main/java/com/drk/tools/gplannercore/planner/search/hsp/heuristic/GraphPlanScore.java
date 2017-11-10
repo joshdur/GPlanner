@@ -4,8 +4,8 @@ import com.drk.tools.gplannercore.core.Context;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
-import com.drk.tools.gplannercore.planner.search.unifier.OperatorUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
+import com.drk.tools.gplannercore.planner.search.unifier.iterators.UnifierIterator;
 import com.drk.tools.gplannercore.planner.state.GState;
 
 import java.util.HashSet;
@@ -35,7 +35,7 @@ public class GraphPlanScore implements Score {
     }
 
     private Layer firstLayer(State initialState, Context context) {
-        SearchUnifier searchUnifier = OperatorUnifier.from(context, initialState);
+        SearchUnifier searchUnifier = new SearchUnifier(initialState, new UnifierIterator(context.getValidUnifiers()));
         Set<Statement> statements = new HashSet<>(initialState.getStatements());
         Set<Transition> transitions = new HashSet<>(searchUnifier.all());
         return new Layer(null, statements, transitions);
@@ -44,7 +44,7 @@ public class GraphPlanScore implements Score {
     private Layer expandLayer(Layer layer, Context context) {
         Set<Statement> statements = new HashSet<>(layer.statements);
         statements.addAll(transitionEffects(layer.applicableTransitions));
-        SearchUnifier searchUnifier = OperatorUnifier.from(context, new GState(statements));
+        SearchUnifier searchUnifier = new SearchUnifier(new GState(statements), new UnifierIterator(context.getValidUnifiers()));
         Set<Transition> transitions = new HashSet<>(searchUnifier.all());
         return new Layer(layer, statements, transitions);
     }

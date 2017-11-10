@@ -1,6 +1,5 @@
 package com.drk.tools.gplannercore.core.state;
 
-import java.util.Collection;
 import java.util.Set;
 
 public interface State {
