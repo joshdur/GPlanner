@@ -1,4 +1,4 @@
-package com.drk.tools.gplannersample;
+package com.drk.tools.gplannersample.ops;
 
 import com.drk.tools.gplannercore.annotations.Operator;
 import com.drk.tools.gplannercore.core.Context;

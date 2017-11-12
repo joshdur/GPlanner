@@ -1,5 +1,6 @@
 package com.drk.tools.gplannercompiler.gen.context;
 
+import com.drk.tools.gplannercompiler.Logger;
 import com.drk.tools.gplannercompiler.gen.GenException;
 import com.drk.tools.gplannercompiler.gen.support.Extractor;
 import com.drk.tools.gplannercore.annotations.core.Range;
@@ -30,7 +31,57 @@ class TypeContext {
     }
 
     String getPackage() {
-        return Extractor.getPackage(unifiers.get(0));
+        String pack = getCommonPackageFromUnifiers();
+        if(pack.endsWith(".")){
+            return pack.substring(0, pack.length()-1);
+        }
+        return !pack.equals("") ?  pack : "com";
+    }
+
+    private List<String> getPackages(){
+        List<String> packages = new ArrayList<>();
+        for(TypeElement element : unifiers){
+            packages.add(Extractor.getPackage(element));
+        }
+        return packages;
+    }
+
+    private String getSmallString(List<String> strs){
+        String small = strs.toString();
+        for(String str : strs){
+            if(small.length() > str.length()){
+                small = str;
+            }
+        }
+        return small;
+    }
+
+    private String getCommonPackageFromUnifiers(){
+        List<String> packages = getPackages();
+        String smallStr = getSmallString(packages);
+        String commonStr="";
+
+        StringBuilder temp= new StringBuilder();
+        char [] smallStrChars=smallStr.toCharArray();
+        for (char c: smallStrChars){
+            temp.append(c);
+            if(allStartsWith(packages, temp.toString())){
+                commonStr = temp.toString();
+            } else {
+                break;
+            }
+        }
+
+        return commonStr;
+    }
+
+    private boolean allStartsWith(List<String> strs , String str){
+        for(String s : strs){
+            if(!s.startsWith(str)){
+                return false;
+            }
+        }
+        return true;
     }
 
     String getClassName() {

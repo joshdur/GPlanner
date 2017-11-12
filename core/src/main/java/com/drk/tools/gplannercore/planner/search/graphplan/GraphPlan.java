@@ -8,6 +8,9 @@ import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.core.state.StateTransition;
 import com.drk.tools.gplannercore.core.state.Statement;
 import com.drk.tools.gplannercore.core.state.Transition;
+import com.drk.tools.gplannercore.planner.logger.EmptyLogger;
+import com.drk.tools.gplannercore.planner.logger.LogLevel;
+import com.drk.tools.gplannercore.planner.logger.Logger;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 import com.drk.tools.gplannercore.planner.search.unifier.iterators.UnifierIterator;
 import com.drk.tools.gplannercore.planner.state.GState;
@@ -21,25 +24,37 @@ import java.util.Set;
 public class GraphPlan implements Searcher {
 
     private final Searcher searcher;
+    private final LogLevel logLevel;
+    private final Logger logger;
+
+    public GraphPlan(Searcher searcher, LogLevel logLevel, Logger logger) {
+        this.searcher = searcher;
+        this.logLevel = logLevel;
+        this.logger = logger;
+    }
 
     public GraphPlan(Searcher searcher) {
-        this.searcher = searcher;
+        this(searcher, LogLevel.NONE, new EmptyLogger());
     }
 
     @Override
     public void startSearch(SearchContext context, State initialState, State finalState) throws SearchException {
+        Extraction extraction = new Extraction(context.getContext(), logLevel, logger);
+
         Layer layer = firstLayer(initialState, context.getContext());
-        boolean reachedGoal = Extraction.reachedGoal(layer, finalState);
+        boolean reachedGoal = extraction.reachedGoal(layer, finalState);
         boolean twoConsecutiveEqualLayer = false;
         while (!reachedGoal && !twoConsecutiveEqualLayer) {
             Layer nextLayer = expandLayer(layer, context.getContext());
-            reachedGoal = Extraction.reachedGoal(nextLayer, finalState);
+            reachedGoal = extraction.reachedGoal(nextLayer, finalState);
             twoConsecutiveEqualLayer = layer.equals(nextLayer);
             layer = nextLayer;
         }
-
+        if (logLevel.isOver(LogLevel.DEBUG)) {
+            logger.log("GraphPlan", "Goal Reached: "+ reachedGoal);
+        }
         if (reachedGoal) {
-            List<Set<Transition>> layeredPlan = Extraction.extract(layer, finalState);
+            List<Set<Transition>> layeredPlan = extraction.extract(layer, finalState);
             Set<Transition> flatSet = new HashSet<>();
             for (Set<Transition> set : layeredPlan) {
                 flatSet.addAll(set);
@@ -63,8 +78,8 @@ public class GraphPlan implements Searcher {
 
     private Layer expandLayer(Layer layer, Context context) {
         Set<Statement> statements = new HashSet<>(transitionEffects(layer.applicableTransitions));
-        statements.addAll(layer.statements);
         Set<Rel> statementExclusions = Mutex.mutexStatements(statements, layer);
+        statements.addAll(layer.statements);
         Set<Transition> transitions = getApplicableTransitions(statementExclusions, context, statements);
         transitions.add(noopTransition(context, layer.statements));
         Set<Rel> transitionExclusions = Mutex.mutexTransitions(transitions, statementExclusions);
@@ -138,7 +153,6 @@ public class GraphPlan implements Searcher {
             }
             return super.equals(obj);
         }
-
     }
 
     static class Rel {

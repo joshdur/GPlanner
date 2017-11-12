@@ -1,9 +1,14 @@
 package com.drk.tools.gplannercore.core.variables.collection;
 
+import com.drk.tools.gplannercore.core.variables.VariableIterator;
 import com.drk.tools.gplannercore.core.variables.VariableRange;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
 public class CollectionVariableRange<T extends CollectionVariable> implements VariableRange<T> {
 
@@ -32,4 +37,11 @@ public class CollectionVariableRange<T extends CollectionVariable> implements Va
     public void clear() {
         variables.clear();
     }
+
+    @Override
+    @NotNull
+    public Iterator<T> iterator(){
+        return new VariableIterator<>(this);
+    }
+
 }

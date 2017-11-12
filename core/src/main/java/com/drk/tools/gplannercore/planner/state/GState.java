@@ -73,4 +73,9 @@ public class GState implements State {
     public int hashCode() {
         return statements.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return statements.toString();
+    }
 }

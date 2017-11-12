@@ -1,6 +1,10 @@
 package com.drk.tools.gplannercore.core.variables.numeric;
 
+import com.drk.tools.gplannercore.core.variables.VariableIterator;
 import com.drk.tools.gplannercore.core.variables.VariableRange;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
 
 public abstract class NumericVariableRange<T extends NumericVariable> implements VariableRange<T> {
 
@@ -39,5 +43,11 @@ public abstract class NumericVariableRange<T extends NumericVariable> implements
 
     private boolean isInRange(int value) {
         return value >= start && value <= end;
+    }
+
+    @Override
+    @NotNull
+    public Iterator<T> iterator(){
+        return new VariableIterator<>(this);
     }
 }

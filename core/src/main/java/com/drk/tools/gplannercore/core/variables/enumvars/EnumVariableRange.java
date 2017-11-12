@@ -1,6 +1,10 @@
 package com.drk.tools.gplannercore.core.variables.enumvars;
 
+import com.drk.tools.gplannercore.core.variables.VariableIterator;
 import com.drk.tools.gplannercore.core.variables.VariableRange;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
 
 public abstract class EnumVariableRange<T extends EnumVariable> implements VariableRange<T> {
 
@@ -21,4 +25,10 @@ public abstract class EnumVariableRange<T extends EnumVariable> implements Varia
     }
 
     protected abstract T variableOf(Enum enumVar);
+
+    @Override
+    @NotNull
+    public Iterator<T> iterator(){
+        return new VariableIterator<>(this);
+    }
 }

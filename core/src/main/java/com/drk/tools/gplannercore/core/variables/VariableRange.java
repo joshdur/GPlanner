@@ -1,6 +1,6 @@
 package com.drk.tools.gplannercore.core.variables;
 
-public interface VariableRange<T extends Variable> {
+public interface VariableRange<T extends Variable> extends Iterable<T>{
 
     int count();
 

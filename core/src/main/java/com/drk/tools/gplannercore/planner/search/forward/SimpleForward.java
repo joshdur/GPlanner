@@ -3,28 +3,33 @@ package com.drk.tools.gplannercore.planner.search.forward;
 import com.drk.tools.gplannercore.core.Plan;
 import com.drk.tools.gplannercore.core.search.SearchException;
 import com.drk.tools.gplannercore.core.search.Searcher;
-import com.drk.tools.gplannercore.core.state.State;
-import com.drk.tools.gplannercore.core.state.Transition;
 import com.drk.tools.gplannercore.core.search.context.SearchContext;
 import com.drk.tools.gplannercore.core.search.context.SearchNode;
+import com.drk.tools.gplannercore.core.state.State;
+import com.drk.tools.gplannercore.core.state.Transition;
+import com.drk.tools.gplannercore.planner.logger.EmptyLogger;
+import com.drk.tools.gplannercore.planner.logger.LogLevel;
+import com.drk.tools.gplannercore.planner.logger.Logger;
 import com.drk.tools.gplannercore.planner.search.unifier.SearchUnifier;
 
 import java.util.Stack;
 
 public class SimpleForward implements Searcher {
 
-    private final boolean debug;
+    private final LogLevel logLevel;
+    private final Logger logger;
 
     private Node buildNode(State state, Transition transition, Node lastNode, SearchUnifier unifier) {
         return new Node(lastNode, state, transition, unifier);
     }
 
-    public SimpleForward(boolean debug) {
-        this.debug = debug;
+    public SimpleForward(LogLevel logLevel, Logger logger) {
+        this.logLevel = logLevel;
+        this.logger = logger;
     }
 
     public SimpleForward() {
-        this(false);
+        this(LogLevel.NONE, new EmptyLogger());
     }
 
     @Override
@@ -41,13 +46,14 @@ public class SimpleForward implements Searcher {
                     State newState = searchContext.applyEffects(node.state, transition);
                     if (!searchContext.existsInSequence(newState, node)) {
                         Node newNode = buildNode(newState, transition, node, searchContext.getUnifier(newState));
-                        if (debug) {
-                            Plan plan = searchContext.recoverSequence(newNode);
-                            System.out.println();
-                            System.out.println(searchContext.getContext().asString(plan));
-                            System.out.println(newState.toString());
+                        if (logLevel.isOver(LogLevel.DEBUG)) {
+                            logger.log("SimpleForward", searchContext.getContext().asString(transition));
+                            logger.log("SimpleForward", newState.toString());
+                            logger.log("SimpleForward", "");
                         }
-
+                        if (logLevel == LogLevel.VERBOSE) {
+                            logger.log("SimpleForward", searchContext.getContext().asString(searchContext.recoverSequence(newNode)));
+                        }
                         if (searchContext.validate(newState, finalState)) {
                             Plan plan = searchContext.recoverSequence(newNode);
                             searchContext.pushPlan(plan);
@@ -62,6 +68,9 @@ public class SimpleForward implements Searcher {
             }
             searchContext.close();
         } catch (SearchException e) {
+            if(logLevel.isOver(LogLevel.ERROR)){
+                logger.log("SimpleForward", "Error in SimpleForward", e);
+            }
             searchContext.close();
             throw e;
         }

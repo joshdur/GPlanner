@@ -4,6 +4,8 @@ import com.drk.tools.gplannercore.core.Plan;
 import com.drk.tools.gplannercore.core.state.State;
 import com.drk.tools.gplannercore.planner.PlanStream;
 import com.drk.tools.gplannercore.planner.Planner;
+import com.drk.tools.gplannercore.planner.logger.DefaultLogger;
+import com.drk.tools.gplannercore.planner.logger.LogLevel;
 import com.drk.tools.gplannercore.planner.search.forward.SimpleForward;
 import com.drk.tools.gplannercore.planner.search.graphplan.GraphPlan;
 import com.drk.tools.gplannercore.planner.state.GStateBuilder;
@@ -13,7 +15,7 @@ import com.drk.tools.gplannersample.vars.ThingRange;
 
 import java.util.List;
 
-import static com.drk.tools.gplannersample.Monkey.*;
+import static com.drk.tools.gplannersample.ops.Monkey.*;
 
 
 public class Main {
@@ -21,8 +23,8 @@ public class Main {
     private static boolean debug = true;
 
     public static void main(String[] args) throws Throwable {
-        //Planner planner = new Planner(new GraphPlan(new SimpleForward()), 10);
-        Planner planner = new Planner(new SimpleForward(), 10);
+        Planner planner = new Planner(new GraphPlan(new SimpleForward(), LogLevel.NONE, new DefaultLogger()), 10);
+        //Planner planner = new Planner(new SimpleForward(), 10);
         DefaultContext monkeyContext = new DefaultContext(debug);
         PlanStream planStream = planner.search(monkeyContext, initialState(), finalState());
         List<Plan> plans = planStream.read();
